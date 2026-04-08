@@ -3,6 +3,7 @@ import colors from 'colors';
 import morgan from 'morgan';
 import cors from 'cors';
 import dotenv from 'dotenv';
+import testRoutes from './routes/testRoutes.js'
 
 //config the .env file
 dotenv.config();
@@ -16,6 +17,8 @@ app.use(express.json());
 app.use(cors());
 
 //route  
+app.use("/api/v1", testRoutes);
+
 app.get("/", (req, res) => {  
 return res.status(200).send("<h1>Welcome To Node server</h1>");  
 });  
