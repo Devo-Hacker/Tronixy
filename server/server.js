@@ -3,10 +3,16 @@ import colors from 'colors';
 import morgan from 'morgan';
 import cors from 'cors';
 import dotenv from 'dotenv';
-import testRoutes from './routes/testRoutes.js'
+
+//routes import
+import testRoutes from './routes/testRoutes.js';
+import connectDB from './config/db.js';
 
 //config the .env file
 dotenv.config();
+
+//database connection
+connectDB(); 
 
 //rest object
 const app = express();
