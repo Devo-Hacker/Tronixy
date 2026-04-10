@@ -4,6 +4,7 @@ import morgan from 'morgan';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import connectDB from './config/db.js';
+import cookieParser from 'cookie-parser'
 
 //config the .env file
 dotenv.config();
@@ -18,6 +19,7 @@ const app = express();
 app.use(morgan("dev"));
 app.use(express.json());
 app.use(cors());
+app.use(cookieParser()); 
 
 //route  
 //routes import
@@ -35,5 +37,5 @@ const PORT = process.env.PORT || 8080;
   
 //listen  
 app.listen(PORT, () => {  
-console.log(`server running on PORT ${process.env.PORT}`.bgMagenta.black);  
+console.log(`server running on PORT ${process.env.PORT} on ${process.env.NODE_ENV}`.bgMagenta.black);  
 });  
