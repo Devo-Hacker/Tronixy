@@ -33,8 +33,13 @@ const userSchema = new mongoose.Schema({
         type:String,
         required:[true, 'enter your phone number']
     },
-    profilePic:{
-        type:String,
+    profilePic: {
+      public_id: {
+        type: String,
+      },
+      url: {
+        type: String,
+      },
     },
 },{timestamps:true});
 //functions
