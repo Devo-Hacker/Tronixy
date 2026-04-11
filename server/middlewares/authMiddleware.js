@@ -3,7 +3,7 @@ import userMdoel from "../models/userModel.js";
 
 // USER AUTH
 export const isAuth = async (req, res, next) => {
-  const { token } = req.cookies; //destructuring token
+  const { token } = req.cookies;
   //valdiation
   if (!token) {
     return res.status(401).send({
@@ -13,5 +13,6 @@ export const isAuth = async (req, res, next) => {
   }
   const decodeData = JWT.verify(token, process.env.JWT_SECRET);
   req.user = await userMdoel.findById(decodeData._id);
-  next(); //for decryping the data
+  next();
 };
+
