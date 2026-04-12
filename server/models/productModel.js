@@ -23,7 +23,7 @@ import mongoose from "mongoose";
 //   { timestamps: true }
 // );
 
-// PROCUCT MODAL
+// PRODUCT MODAL
 const productSchema = new mongoose.Schema(
   {
     name: {
