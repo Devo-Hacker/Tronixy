@@ -66,7 +66,7 @@ export const createProductController = async (req,res) => {
     //     message: "Please Provide all fields",
     //   });
     // }
-     if (!req.file) {
+ if (!req.file) {
       return res.status(500).send({
         success: false,
         message: "please provide product images",
@@ -78,7 +78,7 @@ export const createProductController = async (req,res) => {
       public_id: cdb.public_id,
       url: cdb.secure_url,
     };
-
+    
     await productModel.create({
       name,
       description,
