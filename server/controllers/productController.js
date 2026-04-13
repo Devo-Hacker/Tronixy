@@ -1,4 +1,6 @@
 import productModel from "../models/productModel.js";
+import cloudinary from "cloudinary";
+import { getDataUri } from "./../utils/features.js";
 
 //get all products
 export const getAllProductsController = async (req, res) => {
@@ -52,3 +54,50 @@ export const getSingleProductController = async (req, res) => {
     });
   }
 };
+
+//create product
+export const createProductController = async (req,res) => {
+    try{
+        const { name, description, price, category, stock } = req.body;
+        // // validtion
+    // if (!name || !description || !price || !stock) {
+    //   return res.status(500).send({
+    //     success: false,
+    //     message: "Please Provide all fields",
+    //   });
+    // }
+     if (!req.file) {
+      return res.status(500).send({
+        success: false,
+        message: "please provide product images",
+      });
+    }
+    const file = getDataUri(req.file);
+    const cdb = await cloudinary.v2.uploader.upload(file.content);
+    const image = {
+      public_id: cdb.public_id,
+      url: cdb.secure_url,
+    };
+
+    await productModel.create({
+      name,
+      description,
+      price,
+      category,
+      stock,
+      images: [image],
+    });
+
+    res.status(201).send({
+      success: true,
+      message: "product Created Successfully",
+    });
+    } catch (error) {
+      console.log(error);
+      res.status(500).send({
+      success: false,
+      message: "Error In Get single Product API",
+      error,
+      });
+    }
+}
