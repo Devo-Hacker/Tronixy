@@ -192,3 +192,96 @@ export const updateProductImageController = async (req, res) => {
     });
   }
 };
+
+//delete product image
+export const deleteProductImageController = async (req,res) =>{
+    try{
+         // find produtc
+    const product = await productModel.findById(req.params.id);
+    // validatin
+    if (!product) {
+      return res.status(404).send({
+        success: false,
+        message: "Product Not Found",
+      });
+    }
+    const id = req.query.id;
+    if (!id) {
+      return res.status(404).send({
+        success: false,
+        message: "product image not found",
+      });
+    }
+    let isExist = -1;
+    product.images.forEach((item, index) => {
+      if (item._id.toString() === id.toString()) isExist = index;
+    });
+    if (isExist < 0) {
+      return res.status(404).send({
+        success: false,
+        message: "Image Not Found",
+      });
+    }
+    //delete
+     await cloudinary.v2.uploader.destroy(product.images[isExist].public_id);
+    product.images.splice(isExist, 1);
+    await product.save();
+    return res.status(200).send({
+      success: true,
+      message: "Product Image deleted Successfully",
+    });
+    }
+    catch (error) {
+    console.log(error);
+    // cast error ||  OBJECT ID
+    if (error.name === "CastError") {
+      return res.status(500).send({
+        success: false,
+        message: "Invalid Id",
+      });
+    }
+    res.status(500).send({
+      success: false,
+      message: "Error In Get UPDATE Products API",
+      error,
+    });
+  }
+}
+
+// DLEETE PRODUCT
+export const deleteProductController = async (req, res) => {
+  try {
+    // find product
+    const product = await productModel.findById(req.params.id);
+    // validation
+    if (!product) {
+      return res.status(404).send({
+        success: false,
+        message: "product not found",
+      });
+    }
+    // find and delete image cloudinary
+    for (let index = 0; index < product.images.length; index++) {
+      await cloudinary.v2.uploader.destroy(product.images[index].public_id);
+    }
+    await product.deleteOne();
+    res.status(200).send({
+      success: true,
+      message: "Product Deleted Successfully",
+    });
+  } catch (error) {
+    console.log(error);
+    // cast error ||  OBJECT ID
+    if (error.name === "CastError") {
+      return res.status(500).send({
+        success: false,
+        message: "Invalid Id",
+      });
+    }
+    res.status(500).send({
+      success: false,
+      message: "Error In Get DELETE Product IMAGE API",
+      error,
+    });
+  }
+};

@@ -2,8 +2,8 @@ import express from "express";
 import { isAuth } from "./../middlewares/authMiddleware.js";
 import {
   createProductController,
-//   deleteProductController,
-//   deleteProductImageController,
+  deleteProductController,
+  deleteProductImageController,
   getAllProductsController,
   getSingleProductController,
 //   getTopProductsController,
@@ -33,5 +33,13 @@ router.put("/:id", isAuth,  updateProductController);
 
 //update product image
 router.put("/image/:id", isAuth, singleUpload, updateProductImageController);
+
+//delete product image
+router.delete("/delete-image/:id", isAuth, deleteProductImageController);
+
+//delete product
+router.delete("/delete/:id", isAuth, deleteProductController);
+
+
 
 export default router
