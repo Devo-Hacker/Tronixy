@@ -102,6 +102,7 @@ export const createProductController = async (req,res) => {
     }
 }
 
+//update product
 export const updateProductController = async (req, res) => {
     try {
         // find product
@@ -141,4 +142,53 @@ export const updateProductController = async (req, res) => {
             error,
         });
     }
-}
+} 
+
+//update product image controller
+export const updateProductImageController = async (req, res) => {
+  try {
+    // find product
+    const product = await productModel.findById(req.params.id);
+    // valdiation
+    if (!product) {
+      return res.status(404).send({
+        success: false,
+        message: "Product not found",
+      });
+    }
+    // check file
+    if (!req.file) {
+      return res.status(404).send({
+        success: false,
+        message: "Product image not found",
+      });
+    }
+    const file = getDataUri(req.file);
+    const cdb = await cloudinary.v2.uploader.upload(file.content);
+    const image = {
+      public_id: cdb.public_id,
+      url: cdb.secure_url,
+    };
+    // save
+    product.images.push(image);
+    await product.save();
+    res.status(200).send({
+      success: true,
+      message: "product image updated",
+    });
+  } catch (error) {
+    console.log(error);
+    // cast error ||  OBJECT ID
+    if (error.name === "CastError") {
+      return res.status(500).send({
+        success: false,
+        message: "Invalid Id",
+      });
+    }
+    res.status(500).send({
+      success: false,
+      message: "Error In Get UPDATE Products API",
+      error,
+    });
+  }
+};
