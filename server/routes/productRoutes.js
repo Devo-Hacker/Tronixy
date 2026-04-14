@@ -8,7 +8,7 @@ import {
   getSingleProductController,
 //   getTopProductsController,
 //   productReviewController,
-//   updateProductController,
+   updateProductController,
 //   updateProductImageController,
 } from "../controllers/productController.js";
 import { singleUpload } from "../middlewares/multer.js";
@@ -27,5 +27,8 @@ router.get("/:id", getSingleProductController);
 
 // CREATE PRODUCT
 router.post("/create", isAuth, singleUpload, createProductController);
+
+//Update products
+router.put("/:id", isAuth,  updateProductController);
 
 export default router
