@@ -3,8 +3,8 @@ import { isAuth } from "./../middlewares/authMiddleware.js";
 import {
   createCategory,
   deleteCategoryController,
-   getAllCategoriesController,
-//  updateCategoryController,
+  getAllCategoriesController,
+  updateCategoryController,
 } from "../controllers/categoryController.js";
 
 const router = express.Router();
@@ -16,6 +16,9 @@ router.post("/create", isAuth, createCategory);
 router.get("/get-all", getAllCategoriesController);
 
 //delete category controller
-router.delete("/delete/:id", isAuth, deleteCategoryController)
+router.delete("/delete/:id", isAuth, deleteCategoryController);
+
+//update the category
+router.put("/update/:id", isAuth, updateCategoryController);
 
 export default router;
