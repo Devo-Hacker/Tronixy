@@ -140,3 +140,69 @@ export const paymetsController = async (req, res) => {
     });
   }
 };
+
+
+//for admin uses only
+// GET ALL ORDERS
+export const getAllOrdersController = async (req, res) => {
+  try {
+    const orders = await orderModel.find({});
+    res.status(200).send({
+      success: true,
+      message: "All Orders Data",
+      totalOrders: orders.length,
+      orders,
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).send({
+      success: false,
+      message: "Error In Get UPDATE Products API",
+      error,
+    });
+  }
+};
+
+// CHANGE ORDER STATUS
+export const changeOrderStatusController = async (req, res) => {
+  try {
+    // find order
+    const order = await orderModel.findById(req.params.id);
+    // validation 
+    if (!order) {
+      return res.status(404).send({
+        success: false,
+        message: "order not found",
+      });
+    }
+    if (order.orderStatus === "processing") order.orderStatus = "shipped";
+    else if (order.orderStatus === "shipped") {
+      order.orderStatus = "deliverd";
+      order.deliverdAt = Date.now();
+    } else {
+      return res.status(500).send({
+        success: false,
+        message: "order already deliverd",
+      });
+    }
+    await order.save();
+    res.status(200).send({
+      success: true,
+      message: "order status updated",
+    });
+  } catch (error) {
+    console.log(error);
+    // cast error ||  OBJECT ID
+    if (error.name === "CastError") {
+      return res.status(500).send({
+        success: false,
+        message: "Invalid Id",
+      });
+    }
+    res.status(500).send({
+      success: false,
+      message: "Error In Get UPDATE Products API",
+      error,
+    });
+  }
+};

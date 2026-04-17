@@ -1,10 +1,12 @@
 import express from "express";
-import { isAuth } from "./../middlewares/authMiddleware.js";
+import { isAdmin, isAuth } from "./../middlewares/authMiddleware.js";
 import {
   createOrderController,
   getMyOrdersController,
   singleOrderDetrailsController,
   paymetsController,
+  getAllOrdersController,
+  changeOrderStatusController,
 } from "../controllers/orderController.js";
 
 const router = express.Router();
@@ -23,6 +25,14 @@ router.get("/my-orders/:id", isAuth, singleOrderDetrailsController);
 
 //ACCEPTpayments
 router.post("/payments", isAuth, paymetsController)
+
+//admin manages all orders
+router.get("/admin/get-all-orders", isAuth, isAdmin, getAllOrdersController);
+
+// change order status
+router.put("/admin/order/:id", isAuth, isAdmin, changeOrderStatusController);
+
+
 
 
 export default router
