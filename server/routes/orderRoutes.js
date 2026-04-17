@@ -4,6 +4,7 @@ import {
   createOrderController,
   getMyOrdersController,
   singleOrderDetrailsController,
+  paymetsController,
 } from "../controllers/orderController.js";
 
 const router = express.Router();
@@ -19,6 +20,9 @@ router.get("/my-orders", isAuth, getMyOrdersController);
 
 //get single order
 router.get("/my-orders/:id", isAuth, singleOrderDetrailsController);
+
+//ACCEPTpayments
+router.post("/payments", isAuth, paymetsController)
 
 
 export default router

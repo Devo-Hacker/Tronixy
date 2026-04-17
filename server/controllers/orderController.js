@@ -1,5 +1,6 @@
 import orderModel from "../models/orderModel.js";
 import productModel from "../models/productModel.js";
+import { stripe } from "../server.js";
 
 export const createOrderController = async (req, res) => {
   try {
@@ -110,3 +111,32 @@ export const singleOrderDetrailsController = async (req, res) => {
   }
 };
  
+// ACCEPT PAYMENTS
+export const paymetsController = async (req, res) => {
+  try {
+    // get ampunt
+    const { totalAmount } = req.body;
+    // validation
+    if (!totalAmount) {
+      return res.status(404).send({
+        success: false,
+        message: "Total Amount is require",
+      });
+    }
+    const { client_secret } = await stripe.paymentIntents.create({
+      amount: Number(totalAmount),
+      currency: "inr",
+    });
+    res.status(200).send({
+      success: true,
+      client_secret,
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).send({
+      success: false,
+      message: "Error In Get UPDATE Products API",
+      error,
+    });
+  }
+};

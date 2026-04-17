@@ -6,12 +6,16 @@ import dotenv from 'dotenv';
 import connectDB from './config/db.js';
 import cookieParser from 'cookie-parser';
 import cloudinary from "cloudinary";
+import Stripe from "stripe";
 
 //config the .env file
 dotenv.config();
 
 //database connection
 connectDB(); 
+
+//stripe config
+export const stripe = new Stripe(process.env.STRIPE_API_SECRET)
 
 //cloudinary config
 cloudinary.v2.config({
