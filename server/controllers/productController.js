@@ -5,7 +5,7 @@ import { getDataUri } from "./../utils/features.js";
 //get all products
 export const getAllProductsController = async (req, res) => {
   try {
-    const products = await productModel
+    const products = await productModel.find({}).populate("category");
     res.status(200).send({
       success: true,
       message: "all products fetched successfully",
@@ -335,6 +335,29 @@ export const productReviewController = async (req, res) => {
       success: false,
       message: "Error In Review Comment API",
       error,
+    });
+  }
+};
+
+//search product result
+export const searchProductController = async (req, res) => {
+  try {
+    const { keyword } = req.query;
+
+    const products = await productModel.find({
+      name: { $regex: keyword, $options: "i" },
+    }).populate("category");
+
+    res.status(200).send({
+      success: true,
+      message:"here are your product results",
+      products,
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).send({
+      success: false,
+      message: "Search failed",
     });
   }
 };

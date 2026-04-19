@@ -10,6 +10,7 @@ import {
    productReviewController,
    updateProductController,
    updateProductImageController,
+   searchProductController
 } from "../controllers/productController.js";
 import { singleUpload } from "../middlewares/multer.js";
 
@@ -18,6 +19,9 @@ const router = express.Router();
 //routes
 //get all products
 router.get("/get-all", getAllProductsController);
+
+//search product
+router.get("/search", searchProductController);
 
 // // GET TOP PRODUCTS
 // router.get("/top", getTopProductsController);
@@ -42,6 +46,7 @@ router.delete("/delete/:id", isAuth, isAdmin, deleteProductController);
 
 // REVIEW PRODUCT
 router.put("/:id/review", isAuth, productReviewController);
+
 
 
 export default router
