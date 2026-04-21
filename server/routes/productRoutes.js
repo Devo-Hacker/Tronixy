@@ -10,7 +10,8 @@ import {
    productReviewController,
    updateProductController,
    updateProductImageController,
-   searchProductController
+   searchProductController,
+    recommendProductController
 } from "../controllers/productController.js";
 import { singleUpload } from "../middlewares/multer.js";
 
@@ -22,6 +23,9 @@ router.get("/get-all", getAllProductsController);
 
 //search product
 router.get("/search", searchProductController);
+
+//recommendation of product
+router.get("/recommend/:id", recommendProductController);
 
 // // GET TOP PRODUCTS
 // router.get("/top", getTopProductsController);

@@ -361,3 +361,47 @@ export const searchProductController = async (req, res) => {
     });
   }
 };
+
+//recommendation algorithm
+export const recommendProductController = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    // 1. Find current product
+    const product = await productModel.findById(id);
+
+    if (!product) {
+      return res.status(404).send({
+        success: false,
+        message: "Product not found",
+      });
+    }
+
+    // 2. Find similar products
+    const recommendations = await productModel.find({
+      category: product.category,
+      _id: { $ne: product._id }, // exclude same product
+      price: {
+        $gte: product.price - 5000,
+        $lte: product.price + 5000,
+      },
+    })
+    .limit(5)
+    .populate("category");
+
+    // 3. Send response
+    res.status(200).send({
+      success: true,
+      message:"things you might be looking for",
+      recommendations,
+    });
+
+  } catch (error) {
+    console.log(error);
+    res.status(500).send({
+      success: false,
+      message: "Recommendation failed",
+      error,
+    });
+  }
+};
