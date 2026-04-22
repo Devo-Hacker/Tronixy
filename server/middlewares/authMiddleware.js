@@ -1,31 +1,41 @@
 import JWT from "jsonwebtoken";
-import userMdoel from "../models/userModel.js";
+import userModel from "../models/userModel.js";
 
 // USER AUTH
 export const isAuth = async (req, res, next) => {
-  const { token } = req.cookies;
+  try {
+    // Read from cookie first, fallback to Authorization header
+    let token = req.cookies.token;
 
-  if (!token) {
+    if (!token && req.headers.authorization) {
+      token = req.headers.authorization.split(" ")[1]; // "Bearer <token>"
+    }
+
+    if (!token) {
+      return res.status(401).send({
+        success: false,
+        message: "UnAuthorized User",
+      });
+    }
+
+    const decodeData = JWT.verify(token, process.env.JWT_SECRET);
+    const user = await userModel.findById(decodeData._id);
+
+    if (!user) {
+      return res.status(401).send({
+        success: false,
+        message: "User not found",
+      });
+    }
+
+    req.user = user;
+    next();
+  } catch (error) {
     return res.status(401).send({
       success: false,
-      message: "UnAuthorized User",
+      message: "Invalid or expired token",
     });
   }
-
-  const decodeData = JWT.verify(token, process.env.JWT_SECRET);
-
-  const user = await userMdoel.findById(decodeData._id);
-
-  // ✅ ONLY ADD THIS CHECK (critical fix)
-  if (!user) {
-    return res.status(401).send({
-      success: false,
-      message: "User not found",
-    });
-  }
-
-  req.user = user;
-  next();
 };
 
 // ADMIN PANEL

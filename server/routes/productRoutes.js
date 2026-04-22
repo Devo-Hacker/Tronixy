@@ -19,7 +19,7 @@ const router = express.Router();
 
 //routes
 //get all products
-router.get("/get-all", getAllProductsController);
+router.get("/", getAllProductsController);
 
 //search product
 router.get("/search", searchProductController);
@@ -34,7 +34,7 @@ router.get("/recommend/:id", recommendProductController);
 router.get("/:id", getSingleProductController);
 
 // CREATE PRODUCT
-router.post("/create", isAuth, singleUpload, isAdmin, createProductController);
+router.post("/create", isAuth, isAdmin, singleUpload, createProductController);
 
 //Update products
 router.put("/:id", isAuth, isAdmin,  updateProductController);

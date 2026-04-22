@@ -30,8 +30,12 @@ const app = express();
 //middleware
 app.use(morgan("dev"));
 app.use(express.json());
-app.use(cors());
 app.use(cookieParser()); 
+app.use(cors({
+  origin: ['http://localhost:5500', 'http://127.0.0.1:5500'],
+  credentials: true,
+}));
+
 
 //route  
 //routes import

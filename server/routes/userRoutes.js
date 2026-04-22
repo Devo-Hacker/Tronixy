@@ -4,7 +4,7 @@ import {
   loginController,
   logoutController,
   registerController,
-  udpatePasswordController,
+  updatePasswordController,
   updateProfileController,
   updateProfilePicController,
 } from "../controllers/userController.js";
@@ -29,7 +29,7 @@ router.get("/logout", isAuth, logoutController);
 router.put("/profile-update", isAuth, updateProfileController);
 
 // updte password
-router.put("/update-password", isAuth, udpatePasswordController);
+router.put("/update-password", isAuth, updatePasswordController);
 
 // update profile pic
 router.put("/update-picture", isAuth, singleUpload, updateProfilePicController);

@@ -66,5 +66,5 @@ userSchema.methods.generateToken = function () {
 
 
 
-export const userMdoel = mongoose.model("Users", userSchema);
-export default userMdoel;
+export const userModel = mongoose.model("Users", userSchema);
+export default userModel;
