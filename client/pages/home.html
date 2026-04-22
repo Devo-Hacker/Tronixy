@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Tronixy – Shop</title>
-  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="../src/output.css" rel="stylesheet"/>
   <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
   <style>
     body { font-family: 'DM Sans', sans-serif; }
@@ -101,7 +101,7 @@
               <span class="text-blue-700 font-bold">₹${p.price.toLocaleString()}</span>
               <span class="text-xs text-gray-400">${p.rating?.toFixed(1) || '0'} ★ (${p.numReviews})</span>
             </div>
-            <a href="/pages/product.html?id=${p._id}"
+            <a href="product.html?id=${p._id}"
               class="block mt-3 text-center bg-gray-900 hover:bg-blue-600 text-white py-1.5 rounded-lg text-xs font-medium transition">
               View Details
             </a>

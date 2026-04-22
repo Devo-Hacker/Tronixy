@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Checkout – Tronixy</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <style>body { font-family: 'DM Sans', sans-serif; } h1,h2 { font-family: 'Syne', sans-serif; }</style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+  <div id="navbar"></div>
+
+  <main class="max-w-4xl mx-auto px-4 py-8">
+    <h1 class="text-2xl font-bold mb-6">Checkout</h1>
+
+    <div id="emptyCart" class="hidden text-center py-16">
+      <p class="text-gray-400 mb-4">Your cart is empty.</p>
+      <a href="home.html" class="text-blue-600 hover:underline text-sm">Back to shop</a>
+    </div>
+
+    <div id="checkoutContent" class="grid md:grid-cols-2 gap-8">
+      <!-- Shipping form -->
+      <div>
+        <h2 class="text-lg font-bold mb-4">Shipping Information</h2>
+        <div id="errMsg" class="hidden bg-red-50 border border-red-200 text-red-600 text-sm px-4 py-2.5 rounded-lg mb-4"></div>
+
+        <div class="bg-white rounded-xl border border-gray-100 p-5 flex flex-col gap-3">
+          <div>
+            <label class="text-xs font-medium text-gray-600 mb-1 block">Address</label>
+            <input id="address" type="text" placeholder="Street address" required
+              class="w-full border border-gray-200 px-3 py-2 rounded-lg text-sm outline-none focus:border-blue-400 transition"/>
+          </div>
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="text-xs font-medium text-gray-600 mb-1 block">City</label>
+              <input id="city" type="text" placeholder="City"
+                class="w-full border border-gray-200 px-3 py-2 rounded-lg text-sm outline-none focus:border-blue-400 transition"/>
+            </div>
+            <div>
+              <label class="text-xs font-medium text-gray-600 mb-1 block">Country</label>
+              <input id="country" type="text" placeholder="Country"
+                class="w-full border border-gray-200 px-3 py-2 rounded-lg text-sm outline-none focus:border-blue-400 transition"/>
+            </div>
+          </div>
+
+          <div class="mt-2">
+            <label class="text-xs font-medium text-gray-600 mb-2 block">Payment Method</label>
+            <div class="flex gap-3">
+              <label class="flex items-center gap-2 cursor-pointer border border-gray-200 rounded-lg px-4 py-2.5 flex-1 hover:border-gray-400 transition has-[:checked]:border-blue-500 has-[:checked]:bg-blue-50">
+                <input type="radio" name="payment" value="COD" checked class="accent-blue-600"/>
+                <span class="text-sm font-medium">Cash on Delivery</span>
+              </label>
+              <label class="flex items-center gap-2 cursor-pointer border border-gray-200 rounded-lg px-4 py-2.5 flex-1 hover:border-gray-400 transition has-[:checked]:border-blue-500 has-[:checked]:bg-blue-50">
+                <input type="radio" name="payment" value="ONLINE" class="accent-blue-600"/>
+                <span class="text-sm font-medium">Online Payment</span>
+              </label>
+            </div>
+          </div>
+
+          <button onclick="placeOrder()" id="placeBtn"
+            class="mt-2 w-full bg-gray-900 hover:bg-blue-600 text-white py-2.5 rounded-xl font-semibold text-sm transition">
+            Place Order
+          </button>
+        </div>
+      </div>
+
+      <!-- Order Summary -->
+      <div>
+        <h2 class="text-lg font-bold mb-4">Your Items</h2>
+        <div id="orderSummary" class="bg-white rounded-xl border border-gray-100 p-5"></div>
+      </div>
+    </div>
+  </main>
+
+  <script src="../js/api.js"></script>
+  <script src="../js/nav.js"></script>
+  <script>
+    async function init() {
+      await Auth.load();
+      if (!Auth.isLoggedIn()) { go('login.html'); return; }
+      renderNav();
+
+      const items = Cart.get();
+      if (!items.length) {
+        document.getElementById('emptyCart').classList.remove('hidden');
+        document.getElementById('checkoutContent').classList.add('hidden');
+        return;
+      }
+
+      // Prefill from user profile
+      const u = Auth.user;
+      if (u) {
+        document.getElementById('address').value = u.address || '';
+        document.getElementById('city').value = u.city || '';
+        document.getElementById('country').value = u.country || '';
+      }
+
+      renderSummary(items);
+    }
+
+    function renderSummary(items) {
+      const subtotal = Cart.total();
+      const tax = Math.round(subtotal * 0.18);
+      const shipping = subtotal > 999 ? 0 : 99;
+      const total = subtotal + tax + shipping;
+
+      document.getElementById('orderSummary').innerHTML = `
+        <div class="flex flex-col gap-2 mb-4">
+          ${items.map(i => `
+            <div class="flex justify-between text-sm py-1 border-b border-gray-50">
+              <span class="text-gray-700 truncate flex-1 mr-2">${i.name} × ${i.qty}</span>
+              <span class="font-medium">₹${(i.price * i.qty).toLocaleString()}</span>
+            </div>
+          `).join('')}
+        </div>
+        <div class="flex flex-col gap-1 text-sm">
+          <div class="flex justify-between text-gray-500"><span>Subtotal</span><span>₹${subtotal.toLocaleString()}</span></div>
+          <div class="flex justify-between text-gray-500"><span>Tax (18%)</span><span>₹${tax.toLocaleString()}</span></div>
+          <div class="flex justify-between text-gray-500"><span>Shipping</span><span>${shipping === 0 ? 'Free' : `₹${shipping}`}</span></div>
+          <div class="flex justify-between font-bold text-gray-900 pt-2 border-t border-gray-100"><span>Total</span><span>₹${total.toLocaleString()}</span></div>
+        </div>
+      `;
+    }
+
+    async function placeOrder() {
+      const btn = document.getElementById('placeBtn');
+      const errEl = document.getElementById('errMsg');
+      errEl.classList.add('hidden');
+
+      const address = document.getElementById('address').value.trim();
+      const city = document.getElementById('city').value.trim();
+      const country = document.getElementById('country').value.trim();
+      const paymentMethod = document.querySelector('input[name="payment"]:checked').value;
+
+      if (!address || !city || !country) {
+        errEl.textContent = 'Please fill all shipping fields.';
+        errEl.classList.remove('hidden');
+        return;
+      }
+
+      const items = Cart.get();
+      const subtotal = Cart.total();
+      const tax = Math.round(subtotal * 0.18);
+      const shipping = subtotal > 999 ? 0 : 99;
+      const totalAmount = subtotal + tax + shipping;
+
+      btn.textContent = 'Placing order...';
+      btn.disabled = true;
+
+      try {
+        await api.post('/order/create', {
+          shippingInfo: { address, city, country },
+          orderItems: items.map(i => ({
+            name: i.name,
+            price: i.price,
+            quantity: i.qty,
+            image: i.images?.[0]?.url || '',
+            product: i._id,
+          })),
+          paymentMethod,
+          paymentInfo: { id: 'manual', status: paymentMethod === 'COD' ? 'pending' : 'paid' },
+          itemPrice: subtotal,
+          tax,
+          shippingCharges: shipping,
+          totalAmount,
+        });
+
+        Cart.clear();
+        toast('Order placed successfully!');
+        go('my-orders.html');
+      } catch (e) {
+        errEl.textContent = e.message;
+        errEl.classList.remove('hidden');
+        btn.textContent = 'Place Order';
+        btn.disabled = false;
+      }
+    }
+
+    init();
+  </script>
+</body>
+</html>

@@ -160,14 +160,25 @@ export const updateProfileController = async (req, res) => {
   try {
     const user = await userModel.findById(req.user._id);
     const { name, email, address, city, country, phone } = req.body;
-    // validation + Update
+
+    // Check if email is taken by another user
+    if (email && email !== user.email) {
+      const emailExists = await userModel.findOne({ email });
+      if (emailExists) {
+        return res.status(400).send({
+          success: false,
+          message: "Email already taken by another account",
+        });
+      }
+    }
+
     if (name) user.name = name;
     if (email) user.email = email;
     if (address) user.address = address;
     if (city) user.city = city;
     if (country) user.country = country;
     if (phone) user.phone = phone;
-    //save user
+
     await user.save();
     res.status(200).send({
       success: true,
@@ -224,29 +235,29 @@ export const updatePasswordController = async (req, res) => {
 export const updateProfilePicController = async (req, res) => {
   try {
     const user = await userModel.findById(req.user._id);
-    // file get from client photo
     const file = getDataUri(req.file);
-    // delete prev image
-    await cloudinary.v2.uploader.destroy(user.profilePic.public_id);
-    // update
+
+    // Only delete old pic if one exists
+    if (user.profilePic && user.profilePic.public_id) {
+      await cloudinary.v2.uploader.destroy(user.profilePic.public_id);
+    }
+
     const cdb = await cloudinary.v2.uploader.upload(file.content);
     user.profilePic = {
       public_id: cdb.public_id,
       url: cdb.secure_url,
     };
-    // save func
     await user.save();
-
     res.status(200).send({
       success: true,
-      message: "profile picture updated",
+      message: "Profile picture updated",
     });
   } catch (error) {
     console.log(error);
     res.status(500).send({
       success: false,
       message: "Error In update profile pic API",
-      error: error.message
+      error: error.message,
     });
   }
 };

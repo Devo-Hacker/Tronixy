@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Admin – Categories</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <style>body { font-family: 'DM Sans', sans-serif; } h1,h2 { font-family: 'Syne', sans-serif; }</style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+  <div id="navbar"></div>
+
+  <main class="max-w-2xl mx-auto px-4 py-8">
+    <div class="flex items-center justify-between mb-6">
+      <h1 class="text-2xl font-bold">Categories</h1>
+      <a href="dashboard.html" class="text-sm text-gray-500 hover:text-gray-900">← Dashboard</a>
+    </div>
+
+    <!-- Create -->
+    <div class="bg-white rounded-2xl border border-gray-100 p-6 mb-6">
+      <h2 class="font-bold mb-4">Add Category</h2>
+      <div id="createMsg" class="hidden text-sm px-3 py-2 rounded-lg mb-3"></div>
+      <div class="flex gap-2">
+        <input id="catName" type="text" placeholder="Category name"
+          class="flex-1 border border-gray-200 px-3 py-2 rounded-lg text-sm outline-none focus:border-blue-400 transition"/>
+        <button onclick="createCategory()" class="bg-gray-900 hover:bg-blue-600 text-white px-5 py-2 rounded-lg text-sm font-semibold transition">Add</button>
+      </div>
+    </div>
+
+    <!-- List -->
+    <div id="catList"><p class="text-gray-400">Loading...</p></div>
+  </main>
+
+  <!-- Edit Modal -->
+  <div id="editModal" class="hidden fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl p-6 w-full max-w-sm">
+      <h2 class="font-bold mb-4">Edit Category</h2>
+      <input id="editCatName" type="text" placeholder="New name"
+        class="w-full border border-gray-200 px-3 py-2 rounded-lg text-sm outline-none focus:border-blue-400 transition mb-4"/>
+      <div class="flex gap-2">
+        <button onclick="saveEdit()" class="flex-1 bg-gray-900 hover:bg-blue-600 text-white py-2 rounded-lg text-sm font-semibold transition">Save</button>
+        <button onclick="closeModal()" class="flex-1 border border-gray-200 py-2 rounded-lg text-sm hover:bg-gray-50 transition">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="../../js/api.js"></script>
+  <script src="../../js/nav.js"></script>
+  <script>
+    let editingId = null;
+
+    async function init() {
+      await Auth.load();
+      if (!Auth.isLoggedIn() || !Auth.isAdmin()) { go('../home.html'); return; }
+      renderNav();
+      loadCategories();
+    }
+
+    async function loadCategories() {
+      try {
+        const data = await api.get('/cat/get-all');
+        const el = document.getElementById('catList');
+
+        if (!data.categories?.length) { el.innerHTML = '<p class="text-gray-400">No categories yet.</p>'; return; }
+
+        el.innerHTML = `
+          <div class="bg-white rounded-xl border border-gray-100 overflow-hidden">
+            ${data.categories.map(c => `
+              <div class="flex items-center justify-between px-5 py-3 border-b border-gray-50 last:border-0">
+                <span class="text-sm font-medium text-gray-800">${c.category}</span>
+                <div class="flex gap-2">
+                  <button onclick="openEdit('${c._id}', '${c.category.replace(/'/g,"\\'")}')"
+                    class="text-xs bg-blue-50 text-blue-700 px-2.5 py-1 rounded-lg hover:bg-blue-100 transition">Edit</button>
+                  <button onclick="deleteCategory('${c._id}')"
+                    class="text-xs bg-red-50 text-red-600 px-2.5 py-1 rounded-lg hover:bg-red-100 transition">Delete</button>
+                </div>
+              </div>
+            `).join('')}
+          </div>`;
+      } catch (e) {
+        document.getElementById('catList').innerHTML = `<p class="text-red-400">${e.message}</p>`;
+      }
+    }
+
+    async function createCategory() {
+      const name = document.getElementById('catName').value.trim();
+      if (!name) return;
+      try {
+        await api.post('/cat/create', { category: name });
+        showMsg('createMsg', 'Category created!');
+        document.getElementById('catName').value = '';
+        loadCategories();
+      } catch (e) {
+        showMsg('createMsg', e.message, true);
+      }
+    }
+
+    async function deleteCategory(id) {
+      if (!confirm('Delete this category?')) return;
+      try {
+        await api.del(`/cat/delete/${id}`);
+        toast('Category deleted');
+        loadCategories();
+      } catch (e) { toast(e.message, 'error'); }
+    }
+
+    function openEdit(id, name) {
+      editingId = id;
+      document.getElementById('editCatName').value = name;
+      document.getElementById('editModal').classList.remove('hidden');
+    }
+
+    function closeModal() {
+      document.getElementById('editModal').classList.add('hidden');
+      editingId = null;
+    }
+
+    async function saveEdit() {
+      const name = document.getElementById('editCatName').value.trim();
+      if (!name) return;
+      try {
+        await api.put(`/cat/update/${editingId}`, { updatedCategory: name });
+        toast('Category updated!');
+        closeModal();
+        loadCategories();
+      } catch (e) { toast(e.message, 'error'); }
+    }
+
+    function showMsg(id, msg, isError = false) {
+      const el = document.getElementById(id);
+      el.textContent = msg;
+      el.className = `text-sm px-3 py-2 rounded-lg mb-3 ${isError ? 'bg-red-50 text-red-600' : 'bg-green-50 text-green-700'}`;
+      el.classList.remove('hidden');
+      setTimeout(() => el.classList.add('hidden'), 4000);
+    }
+
+    init();
+  </script>
+</body>
+</html>

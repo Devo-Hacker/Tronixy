@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Cart – Tronixy</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <style>body { font-family: 'DM Sans', sans-serif; } h1,h2 { font-family: 'Syne', sans-serif; }</style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+  <div id="navbar"></div>
+
+  <main class="max-w-4xl mx-auto px-4 py-8">
+    <h1 class="text-2xl font-bold mb-6">Your Cart</h1>
+    <div id="cartContent"></div>
+  </main>
+
+  <script src="../js/api.js"></script>
+  <script src="../js/nav.js"></script>
+  <script>
+    async function init() {
+      await Auth.load();
+      renderNav('cart');
+      renderCart();
+    }
+
+    function renderCart() {
+      const items = Cart.get();
+      const el = document.getElementById('cartContent');
+
+      if (!items.length) {
+        el.innerHTML = `
+          <div class="text-center py-20">
+            <p class="text-5xl mb-4">🛒</p>
+            <p class="text-gray-500 mb-4">Your cart is empty</p>
+            <a href="home.html" class="inline-block bg-gray-900 text-white px-6 py-2.5 rounded-xl text-sm font-semibold hover:bg-blue-600 transition">Start Shopping</a>
+          </div>`;
+        return;
+      }
+
+      const subtotal = Cart.total();
+      const tax = Math.round(subtotal * 0.18);
+      const shipping = subtotal > 999 ? 0 : 99;
+      const total = subtotal + tax + shipping;
+
+      el.innerHTML = `
+        <div class="grid md:grid-cols-3 gap-6">
+          <!-- Items list -->
+          <div class="md:col-span-2 flex flex-col gap-3">
+            ${items.map(item => `
+              <div class="bg-white rounded-xl border border-gray-100 p-4 flex gap-4 items-center">
+                <img src="${item.images?.[0]?.url || 'https://placehold.co/80x80/f3f4f6/9ca3af?text=?'}"
+                  class="w-16 h-16 object-cover rounded-lg flex-shrink-0"/>
+                <div class="flex-1 min-w-0">
+                  <p class="font-semibold text-gray-900 text-sm truncate">${item.name}</p>
+                  <p class="text-blue-600 font-bold">₹${item.price.toLocaleString()}</p>
+                </div>
+                <div class="flex items-center gap-2 flex-shrink-0">
+                  <button onclick="changeQty('${item._id}', -1)" class="w-7 h-7 rounded-full bg-gray-100 hover:bg-gray-200 text-sm font-bold transition">−</button>
+                  <span class="text-sm font-semibold w-5 text-center">${item.qty}</span>
+                  <button onclick="changeQty('${item._id}', 1)" class="w-7 h-7 rounded-full bg-gray-100 hover:bg-gray-200 text-sm font-bold transition">+</button>
+                </div>
+                <button onclick="removeItem('${item._id}')" class="text-red-400 hover:text-red-600 text-sm ml-2 transition">✕</button>
+              </div>
+            `).join('')}
+
+            <button onclick="clearCart()" class="text-red-400 hover:text-red-600 text-xs text-left mt-1 transition">Clear cart</button>
+          </div>
+
+          <!-- Summary -->
+          <div class="bg-white rounded-xl border border-gray-100 p-5 h-fit">
+            <h2 class="font-bold text-gray-900 mb-4">Order Summary</h2>
+            <div class="flex flex-col gap-2 text-sm mb-4">
+              <div class="flex justify-between text-gray-600"><span>Subtotal</span><span>₹${subtotal.toLocaleString()}</span></div>
+              <div class="flex justify-between text-gray-600"><span>Tax (18%)</span><span>₹${tax.toLocaleString()}</span></div>
+              <div class="flex justify-between text-gray-600"><span>Shipping</span><span>${shipping === 0 ? '<span class="text-green-600">Free</span>' : `₹${shipping}`}</span></div>
+              <div class="border-t border-gray-100 pt-2 flex justify-between font-bold text-gray-900"><span>Total</span><span>₹${total.toLocaleString()}</span></div>
+            </div>
+            ${Auth.isLoggedIn()
+              ? `<a href="checkout.html" class="block w-full text-center bg-gray-900 hover:bg-blue-600 text-white py-2.5 rounded-xl text-sm font-semibold transition">Proceed to Checkout</a>`
+              : `<a href="login.html" class="block w-full text-center bg-gray-900 hover:bg-blue-600 text-white py-2.5 rounded-xl text-sm font-semibold transition">Login to Checkout</a>`
+            }
+          </div>
+        </div>
+      `;
+    }
+
+    function changeQty(id, delta) {
+      const items = Cart.get();
+      const idx = items.findIndex(i => i._id === id);
+      if (idx < 0) return;
+      items[idx].qty += delta;
+      if (items[idx].qty < 1) items.splice(idx, 1);
+      Cart.save(items);
+      renderCart();
+      renderNav('cart');
+    }
+
+    function removeItem(id) {
+      Cart.remove(id);
+      renderCart();
+      renderNav('cart');
+    }
+
+    function clearCart() {
+      Cart.clear();
+      renderCart();
+      renderNav('cart');
+    }
+
+    init();
+  </script>
+</body>
+</html>

@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Admin – Orders</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <style>body { font-family: 'DM Sans', sans-serif; } h1,h2 { font-family: 'Syne', sans-serif; }</style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+  <div id="navbar"></div>
+
+  <main class="max-w-5xl mx-auto px-4 py-8">
+    <div class="flex items-center justify-between mb-6">
+      <h1 class="text-2xl font-bold">All Orders</h1>
+      <a href="dashboard.html" class="text-sm text-gray-500 hover:text-gray-900">← Dashboard</a>
+    </div>
+    <div id="ordersContent"><p class="text-gray-400">Loading...</p></div>
+  </main>
+
+  <script src="../../js/api.js"></script>
+  <script src="../../js/nav.js"></script>
+  <script>
+    async function init() {
+      await Auth.load();
+      if (!Auth.isLoggedIn() || !Auth.isAdmin()) { go('../home.html'); return; }
+      renderNav();
+      loadOrders();
+    }
+
+    async function loadOrders() {
+      try {
+        const data = await api.get('/order/admin/get-all-orders');
+        const el = document.getElementById('ordersContent');
+
+        if (!data.orders?.length) { el.innerHTML = '<p class="text-gray-400">No orders yet.</p>'; return; }
+
+        const statusColor = { processing: 'bg-yellow-100 text-yellow-700', shipped: 'bg-blue-100 text-blue-700', deliverd: 'bg-green-100 text-green-700' };
+
+        el.innerHTML = `
+          <div class="overflow-x-auto rounded-xl border border-gray-100">
+            <table class="w-full text-sm">
+              <thead class="bg-gray-50 text-gray-500 text-xs uppercase tracking-wide">
+                <tr>
+                  <th class="px-4 py-3 text-left">Order ID</th>
+                  <th class="px-4 py-3 text-left">Items</th>
+                  <th class="px-4 py-3 text-left">Amount</th>
+                  <th class="px-4 py-3 text-left">Payment</th>
+                  <th class="px-4 py-3 text-left">Status</th>
+                  <th class="px-4 py-3 text-left">Action</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-gray-50 bg-white">
+                ${data.orders.map(o => `
+                  <tr>
+                    <td class="px-4 py-3">
+                      <p class="font-mono text-xs text-gray-500">${o._id.slice(-8)}...</p>
+                      <p class="text-xs text-gray-400">${new Date(o.createdAt).toLocaleDateString('en-IN')}</p>
+                    </td>
+                    <td class="px-4 py-3 text-gray-600">${o.orderItems?.length} item(s)</td>
+                    <td class="px-4 py-3 font-semibold">₹${o.totalAmount?.toLocaleString()}</td>
+                    <td class="px-4 py-3 text-gray-500">${o.paymentMethod}</td>
+                    <td class="px-4 py-3">
+                      <span class="text-xs px-2 py-0.5 rounded-full font-medium ${statusColor[o.orderStatus] || 'bg-gray-100 text-gray-600'}">${o.orderStatus}</span>
+                    </td>
+                    <td class="px-4 py-3">
+                      ${o.orderStatus !== 'deliverd' ? `
+                        <button onclick="updateStatus('${o._id}')"
+                          class="text-xs bg-gray-900 text-white px-3 py-1.5 rounded-lg hover:bg-blue-600 transition">
+                          ${o.orderStatus === 'processing' ? 'Mark Shipped' : 'Mark Delivered'}
+                        </button>
+                      ` : '<span class="text-xs text-green-600 font-medium">Delivered</span>'}
+                    </td>
+                  </tr>
+                `).join('')}
+              </tbody>
+            </table>
+          </div>`;
+      } catch (e) {
+        document.getElementById('ordersContent').innerHTML = `<p class="text-red-400">${e.message}</p>`;
+      }
+    }
+
+    async function updateStatus(id) {
+      try {
+        await api.put(`/order/admin/order/${id}`, {});
+        toast('Order status updated!');
+        loadOrders();
+      } catch (e) { toast(e.message, 'error'); }
+    }
+
+    init();
+  </script>
+</body>
+</html>

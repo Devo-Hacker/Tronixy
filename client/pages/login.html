@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Login – Tronixy</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <style>body { font-family: 'DM Sans', sans-serif; } h1,h2 { font-family: 'Syne', sans-serif; }</style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+  <div id="navbar"></div>
+
+  <main class="max-w-md mx-auto px-4 py-16">
+    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-8">
+      <h1 class="text-2xl font-bold text-gray-900 mb-1">Welcome Back</h1>
+      <p class="text-gray-500 text-sm mb-6">Login to your Tronixy account</p>
+
+      <div id="errorMsg" class="hidden bg-red-50 border border-red-200 text-red-600 text-sm px-4 py-2.5 rounded-lg mb-4"></div>
+
+      <form id="loginForm" onsubmit="handleLogin(event)" class="flex flex-col gap-4">
+        <div>
+          <label class="text-xs font-medium text-gray-600 mb-1 block">Email</label>
+          <input id="email" type="email" placeholder="you@example.com" required
+            class="w-full border border-gray-200 px-3 py-2.5 rounded-lg text-sm outline-none focus:border-blue-400 focus:ring-1 focus:ring-blue-100 transition"/>
+        </div>
+        <div>
+          <label class="text-xs font-medium text-gray-600 mb-1 block">Password</label>
+          <input id="password" type="password" placeholder="••••••••" required
+            class="w-full border border-gray-200 px-3 py-2.5 rounded-lg text-sm outline-none focus:border-blue-400 focus:ring-1 focus:ring-blue-100 transition"/>
+        </div>
+        <button type="submit" id="loginBtn"
+          class="bg-gray-900 hover:bg-blue-600 text-white py-2.5 rounded-lg font-semibold text-sm transition mt-1">
+          Login
+        </button>
+      </form>
+
+      <p class="text-center text-sm text-gray-500 mt-5">
+        Don't have an account? <a href="register.html" class="text-blue-600 font-medium hover:underline">Register</a>
+      </p>
+    </div>
+  </main>
+
+ <script src="../js/api.js"></script>
+<script src="../js/nav.js"></script>
+<script>
+  async function init() {
+    await Auth.load();
+    if (Auth.isLoggedIn()) go('home.html');
+    renderNav('login');
+  }
+
+  async function handleLogin(e) {
+    e.preventDefault();
+    const btn = document.getElementById('loginBtn');
+    const errEl = document.getElementById('errorMsg');
+    errEl.classList.add('hidden');
+    btn.textContent = 'Logging in...';
+    btn.disabled = true;
+
+    try {
+      const data = await api.post('/user/login', {
+        email: document.getElementById('email').value,
+        password: document.getElementById('password').value,
+      });
+      if (data.token) TokenStore.set(data.token);
+      toast('Login successful!');
+      go('home.html');
+    } catch (err) {
+      errEl.textContent = err.message;
+      errEl.classList.remove('hidden');
+      btn.textContent = 'Login';
+      btn.disabled = false;
+    }
+  }
+
+  init();
+</script>
+</body>
+</html>

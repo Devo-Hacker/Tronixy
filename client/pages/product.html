@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Product – Tronixy</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <style>body { font-family: 'DM Sans', sans-serif; } h1,h2,h3 { font-family: 'Syne', sans-serif; }</style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+  <div id="navbar"></div>
+
+  <main class="max-w-5xl mx-auto px-4 py-8" id="productPage">
+    <p class="text-gray-400 text-center py-16">Loading product...</p>
+  </main>
+
+  <script src="../js/api.js"></script>
+  <script src="../js/nav.js"></script>
+  <script>
+    const productId = new URLSearchParams(window.location.search).get('id');
+
+    async function init() {
+      await Auth.load();
+      renderNav();
+      if (!productId) { document.getElementById('productPage').innerHTML = '<p class="text-red-400 text-center py-16">No product ID provided.</p>'; return; }
+      loadProduct();
+    }
+
+    async function loadProduct() {
+      try {
+        const data = await api.get(`/product/${productId}`);
+        const p = data.product;
+        renderProduct(p);
+        loadRecommendations();
+      } catch (e) {
+        document.getElementById('productPage').innerHTML = `<p class="text-red-400 text-center py-16">${e.message}</p>`;
+      }
+    }
+
+    function renderProduct(p) {
+      const imgs = p.images?.length ? p.images : [{ url: 'https://placehold.co/600x400/f3f4f6/9ca3af?text=No+Image' }];
+
+      document.getElementById('productPage').innerHTML = `
+        <a href="home.html" class="inline-flex items-center gap-1 text-sm text-gray-500 hover:text-gray-800 mb-6">← Back to Shop</a>
+
+        <div class="grid md:grid-cols-2 gap-8 mb-10">
+          <!-- Images -->
+          <div>
+            <img id="mainImg" src="${imgs[0].url}" alt="${p.name}" class="w-full h-80 object-cover rounded-2xl border border-gray-100 mb-3"/>
+            <div class="flex gap-2 flex-wrap">
+              ${imgs.map(img => `
+                <img src="${img.url}" alt="" onclick="document.getElementById('mainImg').src='${img.url}'"
+                  class="w-16 h-16 object-cover rounded-lg border border-gray-200 cursor-pointer hover:border-blue-400 transition"/>
+              `).join('')}
+            </div>
+          </div>
+
+          <!-- Info -->
+          <div>
+            <p class="text-blue-500 text-xs font-medium mb-1">${p.category?.category || 'Uncategorized'}</p>
+            <h1 class="text-2xl font-bold text-gray-900 mb-2">${p.name}</h1>
+            <div class="flex items-center gap-3 mb-4">
+              <span class="text-yellow-500 text-sm">${'★'.repeat(Math.round(p.rating || 0))}${'☆'.repeat(5 - Math.round(p.rating || 0))}</span>
+              <span class="text-xs text-gray-500">${p.numReviews} reviews</span>
+              <span class="text-xs px-2 py-0.5 rounded-full ${p.stock > 0 ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-600'}">${p.stock > 0 ? `In Stock (${p.stock})` : 'Out of Stock'}</span>
+            </div>
+            <p class="text-3xl font-bold text-gray-900 mb-4">₹${p.price?.toLocaleString()}</p>
+            <p class="text-gray-600 text-sm leading-relaxed mb-6">${p.description}</p>
+
+            <div class="flex gap-3">
+              <button onclick="addToCart()" ${p.stock < 1 ? 'disabled' : ''}
+                class="flex-1 bg-gray-900 hover:bg-blue-600 disabled:bg-gray-300 text-white py-2.5 rounded-xl font-semibold text-sm transition">
+                Add to Cart
+              </button>
+              <a href="cart.html"
+                class="flex-1 border border-gray-900 hover:bg-gray-900 hover:text-white text-gray-900 py-2.5 rounded-xl font-semibold text-sm text-center transition">
+                View Cart
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Reviews -->
+        <div class="bg-white rounded-2xl border border-gray-100 p-6 mb-6">
+          <h2 class="text-lg font-bold mb-4">Customer Reviews</h2>
+          <div id="reviewsList">
+            ${p.reviews?.length ? p.reviews.map(r => `
+              <div class="border-b border-gray-100 py-3 last:border-0">
+                <div class="flex items-center justify-between mb-1">
+                  <span class="font-medium text-sm">${r.name}</span>
+                  <span class="text-yellow-500 text-sm">${'★'.repeat(r.rating)}${'☆'.repeat(5-r.rating)}</span>
+                </div>
+                <p class="text-gray-600 text-sm">${r.comment || ''}</p>
+              </div>
+            `).join('') : '<p class="text-gray-400 text-sm">No reviews yet.</p>'}
+          </div>
+        </div>
+
+        <!-- Add Review (logged in users) -->
+        ${Auth.isLoggedIn() ? `
+        <div class="bg-white rounded-2xl border border-gray-100 p-6 mb-6">
+          <h2 class="text-lg font-bold mb-4">Write a Review</h2>
+          <div id="reviewError" class="hidden bg-red-50 text-red-600 text-sm px-3 py-2 rounded-lg mb-3"></div>
+          <div class="flex flex-col gap-3">
+            <div>
+              <label class="text-xs font-medium text-gray-600 mb-1 block">Rating</label>
+              <select id="rating" class="border border-gray-200 px-3 py-2 rounded-lg text-sm w-full outline-none focus:border-blue-400">
+                <option value="5">★★★★★ (5)</option>
+                <option value="4">★★★★☆ (4)</option>
+                <option value="3">★★★☆☆ (3)</option>
+                <option value="2">★★☆☆☆ (2)</option>
+                <option value="1">★☆☆☆☆ (1)</option>
+              </select>
+            </div>
+            <div>
+              <label class="text-xs font-medium text-gray-600 mb-1 block">Comment</label>
+              <textarea id="comment" rows="3" placeholder="Share your experience..." 
+                class="w-full border border-gray-200 px-3 py-2 rounded-lg text-sm outline-none focus:border-blue-400 resize-none"></textarea>
+            </div>
+            <button onclick="submitReview()" class="bg-gray-900 hover:bg-blue-600 text-white py-2 rounded-lg text-sm font-semibold transition w-full">Submit Review</button>
+          </div>
+        </div>
+        ` : `<p class="text-sm text-gray-500 text-center"><a href="login.html" class="text-blue-600 hover:underline">Login</a> to write a review.</p>`}
+
+        <!-- Recommendations -->
+        <div>
+          <h2 class="text-lg font-bold mb-4">You Might Also Like</h2>
+          <div id="recommendations" class="grid grid-cols-2 md:grid-cols-4 gap-4"></div>
+        </div>
+      `;
+
+      // store product for cart
+      window._product = p;
+    }
+
+    function addToCart() {
+      if (!window._product) return;
+      Cart.add(window._product, 1);
+      toast('Added to cart!');
+      renderNav();
+    }
+
+    async function submitReview() {
+      const errEl = document.getElementById('reviewError');
+      errEl.classList.add('hidden');
+      try {
+        await api.put(`/product/${productId}/review`, {
+          rating: document.getElementById('rating').value,
+          comment: document.getElementById('comment').value,
+        });
+        toast('Review submitted!');
+        loadProduct();
+      } catch (e) {
+        errEl.textContent = e.message;
+        errEl.classList.remove('hidden');
+      }
+    }
+
+    async function loadRecommendations() {
+      try {
+        const data = await api.get(`/product/recommend/${productId}`);
+        const el = document.getElementById('recommendations');
+        if (!el) return;
+        el.innerHTML = data.recommendations.length ? data.recommendations.map(p => `
+          <a href="product.html?id=${p._id}" class="bg-white rounded-xl border border-gray-100 overflow-hidden hover:shadow-md transition block">
+            <img src="${p.images?.[0]?.url || 'https://placehold.co/200x150/f3f4f6/9ca3af?text=No+Image'}" class="w-full h-32 object-cover"/>
+            <div class="p-2">
+              <p class="text-xs font-medium text-gray-800 truncate">${p.name}</p>
+              <p class="text-blue-600 font-bold text-sm">₹${p.price?.toLocaleString()}</p>
+            </div>
+          </a>
+        `).join('') : '<p class="text-gray-400 text-sm col-span-full">No recommendations found.</p>';
+      } catch {}
+    }
+
+    init();
+  </script>
+</body>
+</html>

@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Order Detail – Tronixy</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <style>body { font-family: 'DM Sans', sans-serif; } h1,h2 { font-family: 'Syne', sans-serif; }</style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+  <div id="navbar"></div>
+  <main class="max-w-3xl mx-auto px-4 py-8" id="orderContent">
+    <p class="text-gray-400">Loading...</p>
+  </main>
+
+  <script src="../js/api.js"></script>
+  <script src="../js/nav.js"></script>
+  <script>
+    const orderId = new URLSearchParams(window.location.search).get('id');
+
+    async function init() {
+      await Auth.load();
+      if (!Auth.isLoggedIn()) { go('login.html'); return; }
+      renderNav('orders');
+      loadOrder();
+    }
+
+    async function loadOrder() {
+      try {
+        const data = await api.get(`/order/my-orders/${orderId}`);
+        const o = data.order;
+        const statusColor = { processing: 'bg-yellow-100 text-yellow-700', shipped: 'bg-blue-100 text-blue-700', deliverd: 'bg-green-100 text-green-700' };
+
+        document.getElementById('orderContent').innerHTML = `
+          <a href="my-orders.html" class="inline-flex items-center gap-1 text-sm text-gray-500 hover:text-gray-800 mb-6">← Back to Orders</a>
+          <h1 class="text-2xl font-bold mb-6">Order Detail</h1>
+
+          <div class="grid md:grid-cols-2 gap-4 mb-4">
+            <!-- Status -->
+            <div class="bg-white rounded-xl border border-gray-100 p-5">
+              <h2 class="font-bold text-gray-900 mb-3">Order Status</h2>
+              <span class="px-3 py-1 rounded-full text-sm font-semibold ${statusColor[o.orderStatus] || 'bg-gray-100 text-gray-600'}">${o.orderStatus}</span>
+              <p class="text-xs text-gray-400 mt-2">Placed: ${new Date(o.createdAt).toLocaleDateString('en-IN', { day:'numeric', month:'long', year:'numeric' })}</p>
+              ${o.deliverdAt ? `<p class="text-xs text-green-600 mt-1">Delivered: ${new Date(o.deliverdAt).toLocaleDateString('en-IN', { day:'numeric', month:'long', year:'numeric' })}</p>` : ''}
+            </div>
+
+            <!-- Shipping Info -->
+            <div class="bg-white rounded-xl border border-gray-100 p-5">
+              <h2 class="font-bold text-gray-900 mb-3">Shipping Address</h2>
+              <p class="text-sm text-gray-600">${o.shippingInfo?.address}</p>
+              <p class="text-sm text-gray-600">${o.shippingInfo?.city}, ${o.shippingInfo?.country}</p>
+            </div>
+          </div>
+
+          <!-- Order Items -->
+          <div class="bg-white rounded-xl border border-gray-100 p-5 mb-4">
+            <h2 class="font-bold text-gray-900 mb-4">Items</h2>
+            ${o.orderItems?.map(i => `
+              <div class="flex items-center gap-3 py-2 border-b border-gray-50 last:border-0">
+                <img src="${i.image || 'https://placehold.co/48x48/f3f4f6/9ca3af?text=?'}" class="w-12 h-12 rounded-lg object-cover"/>
+                <div class="flex-1">
+                  <p class="text-sm font-medium text-gray-800">${i.name}</p>
+                  <p class="text-xs text-gray-400">Qty: ${i.quantity}</p>
+                </div>
+                <p class="font-semibold text-sm">₹${(i.price * i.quantity).toLocaleString()}</p>
+              </div>
+            `).join('')}
+          </div>
+
+          <!-- Payment Summary -->
+          <div class="bg-white rounded-xl border border-gray-100 p-5">
+            <h2 class="font-bold text-gray-900 mb-3">Payment Summary</h2>
+            <div class="flex flex-col gap-1 text-sm">
+              <div class="flex justify-between text-gray-500"><span>Item Total</span><span>₹${o.itemPrice?.toLocaleString()}</span></div>
+              <div class="flex justify-between text-gray-500"><span>Tax</span><span>₹${o.tax?.toLocaleString()}</span></div>
+              <div class="flex justify-between text-gray-500"><span>Shipping</span><span>₹${o.shippingCharges?.toLocaleString()}</span></div>
+              <div class="flex justify-between font-bold text-gray-900 pt-2 border-t border-gray-100 mt-1"><span>Total</span><span>₹${o.totalAmount?.toLocaleString()}</span></div>
+              <div class="flex justify-between text-gray-500 mt-1"><span>Payment Method</span><span>${o.paymentMethod}</span></div>
+            </div>
+          </div>
+        `;
+      } catch (e) {
+        document.getElementById('orderContent').innerHTML = `<p class="text-red-400">${e.message}</p>`;
+      }
+    }
+
+    init();
+  </script>
+</body>
+</html>

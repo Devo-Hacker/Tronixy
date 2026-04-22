@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Admin – Products</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <style>body { font-family: 'DM Sans', sans-serif; } h1,h2 { font-family: 'Syne', sans-serif; }</style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+  <div id="navbar"></div>
+
+  <main class="max-w-5xl mx-auto px-4 py-8">
+    <div class="flex items-center justify-between mb-6">
+      <h1 class="text-2xl font-bold">Products</h1>
+      <a href="dashboard.html" class="text-sm text-gray-500 hover:text-gray-900">← Dashboard</a>
+    </div>
+
+    <!-- Create Product -->
+    <div class="bg-white rounded-2xl border border-gray-100 p-6 mb-6">
+      <h2 class="font-bold mb-4">Add New Product</h2>
+      <div id="createMsg" class="hidden text-sm px-3 py-2 rounded-lg mb-3"></div>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <div>
+          <label class="text-xs text-gray-500 mb-1 block">Name</label>
+          <input id="pName" type="text" class="w-full border border-gray-200 px-3 py-2 rounded-lg text-sm outline-none focus:border-blue-400 transition"/>
+        </div>
+        <div>
+          <label class="text-xs text-gray-500 mb-1 block">Price (₹)</label>
+          <input id="pPrice" type="number" class="w-full border border-gray-200 px-3 py-2 rounded-lg text-sm outline-none focus:border-blue-400 transition"/>
+        </div>
+        <div>
+          <label class="text-xs text-gray-500 mb-1 block">Stock</label>
+          <input id="pStock" type="number" class="w-full border border-gray-200 px-3 py-2 rounded-lg text-sm outline-none focus:border-blue-400 transition"/>
+        </div>
+        <div>
+          <label class="text-xs text-gray-500 mb-1 block">Category</label>
+          <select id="pCategory" class="w-full border border-gray-200 px-3 py-2 rounded-lg text-sm outline-none focus:border-blue-400 transition">
+            <option value="">-- Select --</option>
+          </select>
+        </div>
+        <div class="sm:col-span-2">
+          <label class="text-xs text-gray-500 mb-1 block">Description</label>
+          <textarea id="pDesc" rows="2" class="w-full border border-gray-200 px-3 py-2 rounded-lg text-sm outline-none focus:border-blue-400 resize-none transition"></textarea>
+        </div>
+        <div class="sm:col-span-2">
+          <label class="text-xs text-gray-500 mb-1 block">Product Image</label>
+          <input id="pImage" type="file" accept="image/*" class="w-full border border-gray-200 px-3 py-2 rounded-lg text-sm"/>
+        </div>
+      </div>
+      <button onclick="createProduct()" id="createBtn" class="mt-4 bg-gray-900 hover:bg-blue-600 text-white px-5 py-2 rounded-lg text-sm font-semibold transition">Add Product</button>
+    </div>
+
+    <!-- Products List -->
+    <div id="productsList"><p class="text-gray-400">Loading products...</p></div>
+  </main>
+
+  <!-- Edit Modal -->
+  <div id="editModal" class="hidden fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl p-6 w-full max-w-md">
+      <h2 class="font-bold mb-4">Edit Product</h2>
+      <div id="editMsg" class="hidden text-sm px-3 py-2 rounded-lg mb-3"></div>
+      <div class="flex flex-col gap-3">
+        <input id="eName" type="text" placeholder="Name" class="border border-gray-200 px-3 py-2 rounded-lg text-sm outline-none focus:border-blue-400 transition"/>
+        <input id="ePrice" type="number" placeholder="Price" class="border border-gray-200 px-3 py-2 rounded-lg text-sm outline-none focus:border-blue-400 transition"/>
+        <input id="eStock" type="number" placeholder="Stock" class="border border-gray-200 px-3 py-2 rounded-lg text-sm outline-none focus:border-blue-400 transition"/>
+        <textarea id="eDesc" rows="2" placeholder="Description" class="border border-gray-200 px-3 py-2 rounded-lg text-sm outline-none focus:border-blue-400 resize-none transition"></textarea>
+
+        <!-- Add extra image -->
+        <div class="border-t border-gray-100 pt-3">
+          <label class="text-xs text-gray-500 mb-1 block">Add Image</label>
+          <input id="eImage" type="file" accept="image/*" class="text-sm w-full border border-gray-200 px-3 py-2 rounded-lg"/>
+        </div>
+      </div>
+      <div class="flex gap-2 mt-4">
+        <button onclick="saveEdit()" class="flex-1 bg-gray-900 hover:bg-blue-600 text-white py-2 rounded-lg text-sm font-semibold transition">Save</button>
+        <button onclick="closeModal()" class="flex-1 border border-gray-200 py-2 rounded-lg text-sm font-semibold hover:bg-gray-50 transition">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="../../js/api.js"></script>
+  <script src="../../js/nav.js"></script>
+  <script>
+    let editingId = null;
+
+    async function init() {
+      await Auth.load();
+      if (!Auth.isLoggedIn() || !Auth.isAdmin()) { go('../home.html'); return; }
+      renderNav();
+      loadCategories();
+      loadProducts();
+    }
+
+    async function loadCategories() {
+      try {
+        const data = await api.get('/cat/get-all');
+        const sel = document.getElementById('pCategory');
+        sel.innerHTML = '<option value="">-- Select --</option>' +
+          data.categories.map(c => `<option value="${c._id}">${c.category}</option>`).join('');
+      } catch {}
+    }
+
+    async function loadProducts() {
+      try {
+        const data = await api.get('/product');
+        const el = document.getElementById('productsList');
+        if (!data.products.length) { el.innerHTML = '<p class="text-gray-400">No products yet.</p>'; return; }
+        el.innerHTML = `
+          <div class="overflow-x-auto rounded-xl border border-gray-100">
+            <table class="w-full text-sm">
+              <thead class="bg-gray-50 text-gray-500 text-xs uppercase tracking-wide">
+                <tr>
+                  <th class="px-4 py-3 text-left">Product</th>
+                  <th class="px-4 py-3 text-left">Category</th>
+                  <th class="px-4 py-3 text-left">Price</th>
+                  <th class="px-4 py-3 text-left">Stock</th>
+                  <th class="px-4 py-3 text-left">Actions</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-gray-50 bg-white">
+                ${data.products.map(p => `
+                  <tr>
+                    <td class="px-4 py-3">
+                      <div class="flex items-center gap-3">
+                        <img src="${p.images?.[0]?.url || 'https://placehold.co/40x40/f3f4f6/9ca3af?text=?'}" class="w-10 h-10 rounded-lg object-cover"/>
+                        <span class="font-medium text-gray-800 truncate max-w-32">${p.name}</span>
+                      </div>
+                    </td>
+                    <td class="px-4 py-3 text-gray-500">${p.category?.category || '—'}</td>
+                    <td class="px-4 py-3 font-semibold">₹${p.price?.toLocaleString()}</td>
+                    <td class="px-4 py-3"><span class="${p.stock > 0 ? 'text-green-600' : 'text-red-500'}">${p.stock}</span></td>
+                    <td class="px-4 py-3">
+                      <div class="flex gap-2">
+                        <button onclick="openEdit('${p._id}', '${p.name.replace(/'/g,"\\'")}', ${p.price}, ${p.stock}, '${(p.description||'').replace(/'/g,"\\'")}')"
+                          class="text-xs bg-blue-50 text-blue-700 px-2.5 py-1 rounded-lg hover:bg-blue-100 transition">Edit</button>
+                        <button onclick="deleteProduct('${p._id}')"
+                          class="text-xs bg-red-50 text-red-600 px-2.5 py-1 rounded-lg hover:bg-red-100 transition">Delete</button>
+                      </div>
+                    </td>
+                  </tr>
+                `).join('')}
+              </tbody>
+            </table>
+          </div>`;
+      } catch (e) {
+        document.getElementById('productsList').innerHTML = `<p class="text-red-400">${e.message}</p>`;
+      }
+    }
+
+    async function createProduct() {
+      const btn = document.getElementById('createBtn');
+      const msgEl = document.getElementById('createMsg');
+      msgEl.classList.add('hidden');
+      const file = document.getElementById('pImage').files[0];
+      if (!file) { showMsg('createMsg', 'Please select an image.', true); return; }
+
+      const fd = new FormData();
+      fd.append('name', document.getElementById('pName').value);
+      fd.append('description', document.getElementById('pDesc').value);
+      fd.append('price', document.getElementById('pPrice').value);
+      fd.append('stock', document.getElementById('pStock').value);
+      fd.append('category', document.getElementById('pCategory').value);
+      fd.append('file', file);
+
+      btn.textContent = 'Creating...'; btn.disabled = true;
+      try {
+        await api.uploadPost('/product/create', fd);
+        showMsg('createMsg', 'Product created!');
+        document.getElementById('pName').value = '';
+        document.getElementById('pDesc').value = '';
+        document.getElementById('pPrice').value = '';
+        document.getElementById('pStock').value = '';
+        document.getElementById('pImage').value = '';
+        loadProducts();
+      } catch (e) {
+        showMsg('createMsg', e.message, true);
+      }
+      btn.textContent = 'Add Product'; btn.disabled = false;
+    }
+
+    async function deleteProduct(id) {
+      if (!confirm('Delete this product?')) return;
+      try {
+        await api.del(`/product/delete/${id}`);
+        toast('Product deleted');
+        loadProducts();
+      } catch (e) { toast(e.message, 'error'); }
+    }
+
+    function openEdit(id, name, price, stock, desc) {
+      editingId = id;
+      document.getElementById('eName').value = name;
+      document.getElementById('ePrice').value = price;
+      document.getElementById('eStock').value = stock;
+      document.getElementById('eDesc').value = desc;
+      document.getElementById('editModal').classList.remove('hidden');
+    }
+
+    function closeModal() {
+      document.getElementById('editModal').classList.add('hidden');
+      editingId = null;
+    }
+
+    async function saveEdit() {
+      const msgEl = document.getElementById('editMsg');
+      msgEl.classList.add('hidden');
+      try {
+        await api.put(`/product/${editingId}`, {
+          name: document.getElementById('eName').value,
+          price: document.getElementById('ePrice').value,
+          stock: document.getElementById('eStock').value,
+          description: document.getElementById('eDesc').value,
+        });
+        // upload extra image if selected
+        const file = document.getElementById('eImage').files[0];
+        if (file) {
+          const fd = new FormData(); fd.append('file', file);
+          await api.upload(`/product/image/${editingId}`, fd);
+        }
+        toast('Product updated!');
+        closeModal();
+        loadProducts();
+      } catch (e) {
+        showMsg('editMsg', e.message, true);
+      }
+    }
+
+    function showMsg(id, msg, isError = false) {
+      const el = document.getElementById(id);
+      el.textContent = msg;
+      el.className = `text-sm px-3 py-2 rounded-lg mb-3 ${isError ? 'bg-red-50 text-red-600' : 'bg-green-50 text-green-700'}`;
+      el.classList.remove('hidden');
+      setTimeout(() => el.classList.add('hidden'), 4000);
+    }
+
+    init();
+  </script>
+</body>
+</html>
