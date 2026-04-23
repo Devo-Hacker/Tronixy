@@ -382,8 +382,8 @@ export const recommendProductController = async (req, res) => {
       category: product.category,
       _id: { $ne: product._id }, // exclude same product
       price: {
-        $gte: product.price - 5000,
-        $lte: product.price + 5000,
+        $gte: product.price - 9000,
+        $lte: product.price + 9000,
       },
     })
     .limit(5)
