@@ -8,57 +8,77 @@ import cookieParser from 'cookie-parser';
 import cloudinary from "cloudinary";
 import Stripe from "stripe";
 
-//config the .env file
+// config env
 dotenv.config();
 
-//database connection
+// DB
 connectDB(); 
 
-//stripe config
-export const stripe = new Stripe(process.env.STRIPE_API_SECRET)
+// Stripe
+export const stripe = new Stripe(process.env.STRIPE_API_SECRET);
 
-//cloudinary config
+// Cloudinary
 cloudinary.v2.config({
   cloud_name: process.env.CLOUDINARY_NAME,
   api_key: process.env.CLOUDINARY_API_KEY,
   api_secret: process.env.CLOUDINARY_SECRET,
 }); 
 
-//rest object
+// app
 const app = express();
 
-//middleware
-app.use(morgan("dev"));
-app.use(express.json());
-app.use(cookieParser()); 
+// ================= CORS FIX =================
+const allowedOrigins = [
+  "http://localhost:5500",
+  "http://127.0.0.1:5500",
+  "https://tronixy.vercel.app"
+];
+
 app.use(cors({
-  origin: ['http://localhost:5500', 'http://127.0.0.1:5500'],
+  origin: function (origin, callback) {
+    // allow requests with no origin (like Postman)
+    if (!origin) return callback(null, true);
+
+    if (allowedOrigins.indexOf(origin) !== -1) {
+      callback(null, true);
+    } else {
+      callback(new Error("CORS not allowed"));
+    }
+  },
   credentials: true,
 }));
 
+// handle preflight requests
+app.options('*', cors());
+// ===========================================
 
-//route  
-//routes import
+// middleware
+app.use(morgan("dev"));
+app.use(express.json());
+app.use(cookieParser());
+
+// routes
 import testRoutes from './routes/testRoutes.js';
 import userRoutes from './routes/userRoutes.js';
 import productRoutes from './routes/productRoutes.js';
 import categoryRoutes from './routes/categoryRoutes.js';
 import orderRoutes from "./routes/orderRoutes.js";
+
 app.use("/api/v1", testRoutes);
 app.use("/api/v1/user", userRoutes);
 app.use("/api/v1/product", productRoutes);
 app.use("/api/v1/cat", categoryRoutes);
 app.use("/api/v1/order", orderRoutes);
 
-
+// test route
 app.get("/", (req, res) => {  
-return res.status(200).send("<h1>Welcome To Node server</h1>");  
+  return res.status(200).send("<h1>Welcome To Node server</h1>");  
 });  
-  
-//port  
+
+// port  
 const PORT = process.env.PORT || 8080;  
-  
-//listen  
+
+// listen  
 app.listen(PORT, () => {  
-console.log(`server running on PORT ${process.env.PORT} on ${process.env.NODE_ENV}`.bgMagenta.black);  
-});  
+  console.log(`server running on PORT ${PORT} in ${process.env.NODE_ENV}`.bgMagenta.black);  
+});
