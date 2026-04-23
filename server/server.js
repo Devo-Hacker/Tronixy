@@ -27,27 +27,11 @@ cloudinary.v2.config({
 // app
 const app = express();
 
-// ================= CORS FIX =================
-const allowedOrigins = [
-  "http://localhost:5500",
-  "http://127.0.0.1:5500",
-  "https://tronixy-2.vercel.app"
-];
-
+// ✅ SIMPLE & WORKING CORS
 app.use(cors({
-  origin: function (origin, callback) {
-    // allow requests with no origin (Postman, mobile apps, etc.)
-    if (!origin) return callback(null, true);
-
-    if (allowedOrigins.includes(origin)) {
-      return callback(null, true);
-    } else {
-      return callback(new Error("CORS not allowed"));
-    }
-  },
-  credentials: true,
+  origin: true,
+  credentials: true
 }));
-// ===========================================
 
 // middleware
 app.use(morgan("dev"));
