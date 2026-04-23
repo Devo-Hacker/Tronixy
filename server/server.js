@@ -36,20 +36,17 @@ const allowedOrigins = [
 
 app.use(cors({
   origin: function (origin, callback) {
-    // allow requests with no origin (like Postman)
+    // allow requests with no origin (Postman, mobile apps, etc.)
     if (!origin) return callback(null, true);
 
-    if (allowedOrigins.indexOf(origin) !== -1) {
-      callback(null, true);
+    if (allowedOrigins.includes(origin)) {
+      return callback(null, true);
     } else {
-      callback(new Error("CORS not allowed"));
+      return callback(new Error("CORS not allowed"));
     }
   },
   credentials: true,
 }));
-
-// handle preflight requests
-app.options('*', cors());
 // ===========================================
 
 // middleware
