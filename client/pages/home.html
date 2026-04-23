@@ -3,164 +3,366 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Tronixy – Shop</title>
+  <title>Tronixy – Electronics Store</title>
   <link href="../src/output.css" rel="stylesheet"/>
-  <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Inter:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Playfair+Display:wght@700&family=Rajdhani:wght@600;700&display=swap" rel="stylesheet"/>
   <style>
-    :root { --cyan: #00f5ff; --glass: rgba(0,245,255,0.04); --glass-border: rgba(0,245,255,0.18); }
-    * { box-sizing: border-box; }
-
-    body {
-      font-family: 'Inter', sans-serif;
-      background: #eef2f7;
-      min-height: 100vh;
-      overflow-x: hidden;
+    :root { 
+      --accent: #ff7a21;
+      --text-main: #000000;
+      --text-sub: #555555;
+      --bg-light: #ffffff;
+      --cyan: #00f5ff; /* Needed for the footer logo */
     }
-    h1,h2,h3 { font-family: 'Rajdhani', sans-serif; }
 
-    body::before {
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Inter', sans-serif; background: var(--bg-light); color: var(--text-main); overflow-x: hidden; }
+
+    /* ── FIXED FULL-WIDTH NAVBAR ── */
+    #navbar {
+      position: absolute;
+      top: 0; left: 0; 
+      width: 100%;
+      min-height: 90px;
+      display: flex;
+      align-items: center;
+      z-index: 100;
+      background: transparent;
+      padding: 0 40px;
+    }
+
+    /* ── HERO SECTION ── */
+    #hero {
+      min-height: 95vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 140px 24px 80px;
+      position: relative;
+      background-color: var(--bg-light);
+    }
+
+    #hero::before {
       content: '';
-      position: fixed; inset: 0;
-      background-image:
+      position: absolute; inset: 0;
+      background-image: 
         linear-gradient(rgba(0,0,0,0.04) 1px, transparent 1px),
         linear-gradient(90deg, rgba(0,0,0,0.04) 1px, transparent 1px);
-      background-size: 40px 40px;
-      pointer-events: none; z-index: 0;
+      background-size: 50px 50px;
+      z-index: 0;
     }
-    body::after {
-      content: ''; position: fixed; top: -200px; right: -100px;
-      width: 600px; height: 600px;
-      background: radial-gradient(circle, rgba(0,180,255,0.1) 0%, rgba(0,100,255,0.05) 40%, transparent 70%);
-      pointer-events: none; z-index: 0;
-      animation: orbFloat 8s ease-in-out infinite;
+
+    .hero-content { position: relative; z-index: 1; width: 100%; max-width: 1000px; }
+
+    .hero-title {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(2.5rem, 8vw, 5.5rem);
+      line-height: 1.1;
+      font-weight: 700;
+      margin-bottom: 24px;
     }
-    @keyframes orbFloat { 0%,100%{transform:translate(0,0)} 50%{transform:translate(40px,30px)} }
 
-    main { position: relative; z-index: 1; }
+    .hero-sub {
+      color: var(--text-sub);
+      font-size: 1rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      margin-bottom: 50px;
+    }
 
-    .glass { background: rgba(15,30,60,0.92); border: 1px solid rgba(0,245,255,0.18); backdrop-filter: blur(12px); }
+    /* ── SEARCH & ALL BUTTON ── */
+    .search-container {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+      align-items: stretch;
+      max-width: 700px;
+      margin: 0 auto;
+      width: 100%;
+    }
+
+    .search-wrap {
+      flex: 1;
+      display: flex;
+      border: 1px solid #e5e7eb;
+      border-radius: 12px;
+      background: white;
+      overflow: hidden;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.04);
+    }
+    
+    .search-input { flex: 1; padding: 16px 24px; border: none; outline: none; font-size: 1rem; }
+
+    .search-btn {
+      background: var(--accent);
+      color: white;
+      padding: 0 30px;
+      border: none;
+      font-weight: 700;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    .all-btn {
+      background: #f3f4f6;
+      color: #000;
+      padding: 0 25px;
+      border-radius: 12px;
+      border: 1px solid #e5e7eb;
+      font-weight: 600;
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+    .all-btn:hover { background: #e5e7eb; }
+
+/* ─── ENHANCED TRANS-LUCENT NAVBAR ─── */
+#navbar nav {
+  background: transparent !important; 
+  border-bottom: 1px solid rgba(0, 0, 0, 0) !important; /* Invisible at top */
+  backdrop-filter: blur(0px) !important;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  position: relative !important;
+  width: 100vw !important;
+  height: 70px !important; /* Increased Height */
+  left: 0 !important;
+  top: 0 !important;
+  display: flex !important;
+  align-items: center !important;
+
+  /* ADD THIS LINE BELOW */
+  border-bottom: 1px solid #e5e7eb !important; 
+  
+  /* Optional: Add a very subtle shadow for a modern look */
+  box-shadow: 0 2px 4px rgba(0,0,0,0.02) !important;
+}
+
+/* Container spacing fix */
+#navbar .max-w-6xl {
+  max-width: 100% !important;
+  width: 100% !important;
+  padding: 0 6% !important;
+}
+
+/* ─── SCROLL STATE (Translucent Glass) ─── */
+.nav-scrolled nav {
+  display: none !important; 
+}
+
+/* Fix text colors for better readability against translucent glass */
+#navbar a, 
+#navbar button:not(.search-btn), 
+#navbar span:not(.cart-badge) {
+  color: #1a1a1a !important;
+  font-weight: 600 !important;
+}
+
+/* Keep Tronixy orange logo */
+#navbar a[href*="home.html"] span {
+  color: var(--accent) !important;
+}
+
+/* User Pill Modernization */
+#navbar a[href*="profile.html"] {
+  background: rgba(0, 0, 0, 0.04) !important;
+  border: 1px solid rgba(0, 0, 0, 0.05) !important;
+  padding: 8px 18px !important;
+  border-radius: 100px !important;
+}
+
+
+    /* ── CATEGORY PILLS ── */
+    .hero-cats { display: flex; gap: 8px; margin-top: 25px; justify-content: center; flex-wrap: wrap; }
+    .cat-pill {
+      background: #f9fafb;
+      padding: 8px 16px;
+      border-radius: 100px;
+      font-size: 0.8rem;
+      color: #666;
+      border: 1px solid #eee;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+    .cat-pill:hover { border-color: var(--accent); color: var(--accent); background: #fff; }
+
+    /* ── PRODUCTS GRID ── */
+    #products-section { padding: 80px 40px; background: #fff; }
+    
+    #productsGrid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 30px;
+      width: 100%;
+    }
 
     .product-card {
-      background: white;
-      border: 1px solid #e5eaf2;
-      transition: transform 0.3s, border-color 0.3s, box-shadow 0.3s;
-      position: relative; overflow: hidden;
+      background: #fff;
+      border: 1px solid #f0f0f0;
+      display: flex;
+      flex-direction: column;
+      transition: 0.3s ease;
     }
-    .product-card::before {
-      content: ''; position: absolute; inset: 0;
-      background: linear-gradient(135deg, rgba(0,245,255,0.03) 0%, transparent 60%);
-      opacity: 0; transition: opacity 0.3s;
-    }
-    .product-card:hover {
-      transform: translateY(-5px);
-      border-color: #bcd0f0;
-      box-shadow: 0 20px 40px rgba(0,50,120,0.1), 0 4px 12px rgba(0,0,0,0.06);
-    }
-    .product-card:hover::before { opacity: 1; }
-
-    .btn-cyan {
-      background: transparent; border: 1px solid var(--cyan);
-      color: var(--cyan); font-family: 'Rajdhani', sans-serif;
-      font-weight: 600; letter-spacing: 0.05em; transition: all 0.2s; cursor: pointer;
-    }
-    .btn-cyan:hover { background: var(--cyan); color: #050a12; box-shadow: 0 0 20px rgba(0,245,255,0.4); }
-
-    .search-input {
-      background: rgba(0,245,255,0.05);
-      border: 1px solid rgba(0,245,255,0.2);
-      color: white; transition: border-color 0.2s, box-shadow 0.2s;
-    }
-    .search-input:focus { outline: none; border-color: var(--cyan); box-shadow: 0 0 0 3px rgba(0,245,255,0.1); }
-    .search-input::placeholder { color: rgba(255,255,255,0.35); }
-
-    .cat-pill {
-      background: white; border: 1px solid #dde3ee;
-      color: #4b5563; font-family: 'Rajdhani', sans-serif;
-      font-weight: 500; letter-spacing: 0.05em;
-      transition: all 0.2s; white-space: nowrap; cursor: pointer;
-    }
-    .cat-pill:hover { border-color: #0066cc; color: #0066cc; background: #f0f6ff; }
-
-    .price-tag { color: #0a4fa0; font-family: 'Rajdhani', sans-serif; font-weight: 700; }
-
-    .hero-scanline { position: relative; overflow: hidden; }
-    .hero-scanline::after {
-      content: ''; position: absolute; top: -2px; left: 0; right: 0; height: 2px;
-      background: linear-gradient(90deg, transparent, rgba(0,245,255,0.5), transparent);
-      animation: scanline 4s linear infinite;
-    }
-    @keyframes scanline { 0%{top:-2px} 100%{top:100%} }
+    .product-card:hover { transform: translateY(-5px); box-shadow: 0 20px 40px rgba(0,0,0,0.06); }
 
     .view-btn {
-      background: #0f1e3c; border: 1px solid #1a3a6e;
-      color: white; font-family: 'Rajdhani', sans-serif;
-      font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase;
-      font-size: 0.7rem; transition: all 0.2s;
-      display: block; text-align: center; text-decoration: none;
+      background: #000;
+      color: #fff;
+      text-align: center;
+      padding: 14px;
+      text-decoration: none;
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 1px;
+      margin-top: auto;
     }
-    .view-btn:hover { background: #0066cc; border-color: #0066cc; box-shadow: 0 4px 15px rgba(0,100,200,0.25); }
 
-    .loading-text {
-      color: #9ca3af; font-family: 'Rajdhani', sans-serif;
-      letter-spacing: 0.15em; text-transform: uppercase;
-      animation: pulse 1.5s ease-in-out infinite;
+    @keyframes fadeUp { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
+    .fade-up { animation: fadeUp 0.6s ease forwards; }
+
+    /* ── FOOTER STYLES ── */
+    footer {
+      background: #080f1a;
+      color: rgba(255,255,255,0.6);
+      padding: 80px 24px 30px;
+      position: relative;
+      overflow: hidden;
+      margin-top: 60px;
     }
-    @keyframes pulse { 0%,100%{opacity:0.4} 50%{opacity:1} }
-
-    .scrollbar-hide::-webkit-scrollbar { display: none; }
-    .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
-
-    @keyframes fadeUp { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:translateY(0)} }
-    .fade-up { animation: fadeUp 0.4s ease forwards; opacity: 0; }
-
-    .section-label {
-      font-family: 'Rajdhani', sans-serif; font-weight: 700;
-      font-size: 1.1rem; color: #1a2a4a; letter-spacing: 0.05em;
-      text-transform: uppercase;
+    footer::before {
+      content: '';
+      position: absolute; inset: 0;
+      background-image:
+        linear-gradient(rgba(0,245,255,0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0,245,255,0.03) 1px, transparent 1px);
+      background-size: 40px 40px;
+      pointer-events: none;
     }
+    .footer-inner {
+      position: relative; z-index: 1;
+      max-width: 1152px; margin: 0 auto;
+    }
+    .footer-grid {
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr;
+      gap: 48px;
+      margin-bottom: 48px;
+    }
+    @media(max-width:768px){
+      .footer-grid { grid-template-columns: 1fr; gap: 32px; }
+    }
+    .footer-logo {
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 1.8rem; font-weight: 700;
+      color: white; margin-bottom: 12px;
+    }
+    .footer-logo span { color: var(--cyan); }
+    .footer-desc { font-size: 0.85rem; line-height: 1.7; color: rgba(255,255,255,0.4); max-width: 280px; }
+    .footer-heading {
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 0.75rem; font-weight: 700;
+      letter-spacing: 0.2em; text-transform: uppercase;
+      color: rgba(0,245,255,0.7); margin-bottom: 16px;
+    }
+    .footer-link {
+      display: block; color: rgba(255,255,255,0.45);
+      text-decoration: none; font-size: 0.85rem;
+      margin-bottom: 8px; transition: color 0.2s;
+    }
+    .footer-link:hover { color: var(--cyan); }
+    .footer-social { display: flex; gap: 12px; margin-top: 20px; }
+    .social-btn {
+      width: 36px; height: 36px;
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      text-decoration: none; font-size: 1rem;
+      transition: all 0.2s; color: rgba(255,255,255,0.5);
+    }
+    .social-btn:hover { border-color: var(--cyan); color: var(--cyan); background: rgba(0,245,255,0.08); }
+    .footer-bottom {
+      border-top: 1px solid rgba(255,255,255,0.06);
+      padding-top: 24px;
+      display: flex; align-items: center; justify-content: space-between;
+      flex-wrap: wrap; gap: 12px;
+    }
+    .footer-copy { font-size: 0.8rem; color: rgba(255,255,255,0.25); font-family: 'Rajdhani', sans-serif; letter-spacing: 0.05em; }
   </style>
 </head>
 <body>
-  <div id="navbar" style="position:fixed;top:0;left:0;width:100%;z-index:40;"></div>
-<div style="height:60px;"></div>
-  <div style="height:60px;"></div>
-  <main class="max-w-6xl mx-auto px-4 py-8">
 
-    <!-- Hero Search — stays dark for contrast -->
-    <div class="hero-scanline glass rounded-2xl p-8 mb-8 relative">
-      <span class="absolute top-3 left-3 w-4 h-4 border-t border-l border-cyan-400 opacity-50"></span>
-      <span class="absolute top-3 right-3 w-4 h-4 border-t border-r border-cyan-400 opacity-50"></span>
-      <span class="absolute bottom-3 left-3 w-4 h-4 border-b border-l border-cyan-400 opacity-50"></span>
-      <span class="absolute bottom-3 right-3 w-4 h-4 border-b border-r border-cyan-400 opacity-50"></span>
-      <div class="relative z-10">
-        <h1 class="text-4xl font-bold text-white mb-1 tracking-wide">Find What You <span class="text-cyan-400">Need</span></h1>
-        <p class="text-gray-400 mb-6 text-sm tracking-wide">Electronics & tech, delivered fast.</p>
-        <form onsubmit="handleSearch(event)" class="flex gap-2">
-          <input id="searchInput" type="text" placeholder="Search products..." class="search-input flex-1 px-4 py-2.5 rounded-lg text-sm"/>
-          <button type="submit" class="btn-cyan px-6 py-2.5 rounded-lg text-sm">Search</button>
-          <button type="button" onclick="loadProducts()" class="px-4 py-2.5 rounded-lg text-sm text-gray-400 border border-white/10 hover:border-white/20 hover:text-white transition">All</button>
+  <div id="navbar"></div>
+
+  <section id="hero">
+    <div class="hero-content">
+      <h1 class="hero-title">Discover Tech that<br/>Defines Tomorrow</h1>
+      <p class="hero-sub">Step into the future with curated electronics.</p>
+
+      <div class="search-container">
+        <form class="search-wrap" onsubmit="handleSearch(event)">
+          <input id="searchInput" type="text" placeholder="Search brands or gadgets..." class="search-input"/>
+          <button type="submit" class="search-btn">SEARCH →</button>
         </form>
+        <button type="button" onclick="resetSearch()" class="all-btn">ALL</button>
+      </div>
+
+      <div id="categoryBar" class="hero-cats"></div>
+    </div>
+  </section>
+
+  <section id="products-section">
+    <div class="max-w-full mx-auto">
+      <div style="display:flex; justify-content: space-between; align-items: flex-end; margin-bottom: 40px; border-bottom: 1px solid #eee; padding-bottom: 20px;">
+        <h2 style="font-family: 'Playfair Display', serif; font-size: 2.2rem;">Latest Arrivals</h2>
+        <span id="productCount" style="color: #999; font-size: 0.9rem; font-weight: 500;"></span>
+      </div>
+      
+      <div id="productsGrid">
+        <p class="col-span-full text-center">Loading collection...</p>
       </div>
     </div>
+  </section>
 
-    <!-- Categories Filter -->
-    <div class="flex items-center gap-3 mb-6">
-      <span class="section-label text-sm">Filter</span>
-      <div id="categoryBar" class="flex gap-2 overflow-x-auto pb-1 scrollbar-hide flex-1"></div>
+  <footer>
+    <div class="footer-inner">
+      <div class="footer-grid">
+        <div>
+          <div class="footer-logo">TRON<span>IXY</span></div>
+          <p class="footer-desc">Your one-stop destination for electronics, gadgets, and tech accessories. Quality products, fast delivery, trusted service.</p>
+          <div class="footer-social">
+            <a href="https://github.com/Devo-Hacker" target="_blank" class="social-btn" title="GitHub">⌨</a>
+            <a href="https://instagram.com" target="_blank" class="social-btn" title="Instagram">📷</a>
+          </div>
+        </div>
+
+        <div>
+          <p class="footer-heading">Quick Links</p>
+          <a href="home.html" class="footer-link">Home</a>
+          <a href="cart.html" class="footer-link">Cart</a>
+          <a href="my-orders.html" class="footer-link">My Orders</a>
+          <a href="login.html" class="footer-link">Login</a>
+          <a href="register.html" class="footer-link">Register</a>
+        </div>
+
+        <div>
+          <p class="footer-heading">Contact</p>
+          <a href="#" class="footer-link">niladreebiharinayak@gmail.comx</a>
+          <a href="#" class="footer-link">mishra0108sakshi@gmail.com</a>
+          <a href="#" class="footer-link">sanjanacps185@gmail.com</a>
+          <p style="font-size:0.85rem;color:rgba(255,255,255,0.3);margin-top:16px;line-height:1.6;">
+            Built with ❤️ by<br/>
+            <span style="color:rgba(0,245,255,0.7);">Tronixy Team</span>
+          </p>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <p class="footer-copy">© 2026 TRONIXY. ALL RIGHTS RESERVED.</p>
+        <p class="footer-copy">MADE IN INDIA 🇮🇳</p>
+      </div>
     </div>
-
-    <!-- Section Header -->
-    <div class="flex items-center justify-between mb-4">
-      <h2 class="section-label">All Products</h2>
-      <span id="productCount" class="text-xs text-gray-400" style="font-family:'Rajdhani',sans-serif;"></span>
-    </div>
-
-    <!-- Products Grid -->
-    <div id="productsGrid" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-      <div class="col-span-full text-center py-16"><p class="loading-text">Initializing...</p></div>
-    </div>
-
-  </main>
+  </footer>
 
   <script src="../js/api.js"></script>
   <script src="../js/nav.js"></script>
@@ -176,14 +378,13 @@
 
     async function loadProducts(keyword = '') {
       const grid = document.getElementById('productsGrid');
-      grid.innerHTML = '<div class="col-span-full text-center py-16"><p class="loading-text">Loading...</p></div>';
       try {
         const url = keyword ? `/product/search?keyword=${encodeURIComponent(keyword)}` : '/product';
         const data = await api.get(url);
         allProducts = data.products;
         renderProducts(allProducts);
       } catch (e) {
-        grid.innerHTML = `<div class="col-span-full text-center py-12 text-red-400 font-mono text-sm">${e.message}</div>`;
+        grid.innerHTML = `<p class="col-span-full text-center text-red-500">${e.message}</p>`;
       }
     }
 
@@ -192,44 +393,40 @@
         const data = await api.get('/cat/get-all');
         const bar = document.getElementById('categoryBar');
         bar.innerHTML = data.categories.map(c => `
-          <button onclick="filterByCategory('${c._id}')" class="cat-pill px-4 py-1.5 rounded-full text-sm">
-            ${c.category}
-          </button>
-        `).join('');
+          <button onclick="filterByCategory('${c._id}')" class="cat-pill">${c.category}</button>
+        `).join('') + `<button onclick="resetSearch()" class="cat-pill">ALL</button>`;
       } catch {}
     }
 
     function filterByCategory(catId) {
       const filtered = allProducts.filter(p => p.category?._id === catId);
       renderProducts(filtered.length ? filtered : allProducts);
+      document.getElementById('products-section').scrollIntoView({ behavior: 'smooth' });
     }
 
     function renderProducts(products) {
       const grid = document.getElementById('productsGrid');
       const countEl = document.getElementById('productCount');
-      if (countEl) countEl.textContent = products.length + ' items';
-
+      if (countEl) countEl.textContent = products.length + ' Items Found';
+      
       if (!products.length) {
-        grid.innerHTML = '<div class="col-span-full text-center py-12 loading-text">No products found</div>';
+        grid.innerHTML = '<p class="col-span-full text-center py-10">No matches found.</p>';
         return;
       }
       grid.innerHTML = products.map((p, i) => `
-        <div class="product-card rounded-xl overflow-hidden fade-up" style="animation-delay:${i * 0.06}s">
-          <div class="relative">
-            <img src="${p.images?.[0]?.url || 'https://placehold.co/400x300/f3f6fb/9ca3af?text=No+Image'}"
-              alt="${p.name}" class="w-full h-44 object-cover"/>
-            <div class="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent"></div>
-            ${p.stock < 1 ? '<span class="absolute top-2 left-2 bg-red-500 text-white text-xs px-2 py-0.5 rounded-full font-mono tracking-wide">Out of Stock</span>' : ''}
-            <span class="absolute top-2 right-2 text-xs font-mono bg-black/40 text-yellow-300 px-1.5 py-0.5 rounded backdrop-blur">${p.rating?.toFixed(1) || '0.0'}★</span>
+        <div class="product-card fade-up" style="animation-delay:${i * 0.05}s">
+          <div style="aspect-ratio: 1/1; overflow: hidden; background: #fff; position: relative; padding:20px;">
+            <img src="${p.images?.[0]?.url || 'https://placehold.co/400x400'}" style="width:100%; height:100%; object-fit: contain;" alt="${p.name}"/>
+            ${p.stock < 1 ? '<span style="position:absolute; top:15px; left:15px; background:black; color:white; font-size:10px; padding:4px 10px;">OUT OF STOCK</span>' : ''}
           </div>
-          <div class="p-3 relative z-10">
-            <p class="text-xs font-mono mb-0.5 tracking-widest uppercase" style="color:#0080aa;">${p.category?.category || 'Uncategorized'}</p>
-            <h3 class="font-semibold text-sm truncate tracking-wide" style="color:#1a2a4a;">${p.name}</h3>
-            <div class="flex items-center justify-between mt-2 mb-3">
-              <span class="price-tag text-lg">₹${p.price.toLocaleString()}</span>
-              <span class="text-xs text-gray-400 font-mono">${p.numReviews} reviews</span>
+          <div style="padding: 20px; border-top: 1px solid #f9f9f9; flex:1; display:flex; flex-direction:column;">
+            <p style="font-size:0.65rem; color:#999; text-transform:uppercase; letter-spacing:1.5px; margin-bottom:8px;">${p.category?.category||'Electronics'}</p>
+            <h3 style="font-size:1.1rem; font-weight:600; margin-bottom:12px; color:#111;">${p.name}</h3>
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+              <span style="font-weight:700; font-size:1.2rem;">₹${p.price.toLocaleString()}</span>
+              <span style="font-size:0.85rem; color:#666;">★ ${p.rating?.toFixed(1)||'0.0'}</span>
             </div>
-            <a href="product.html?id=${p._id}" class="view-btn py-1.5 rounded-lg">View Details</a>
+            <a href="product.html?id=${p._id}" class="view-btn">EXPLORE PRODUCT</a>
           </div>
         </div>
       `).join('');
@@ -238,10 +435,27 @@
     function handleSearch(e) {
       e.preventDefault();
       const keyword = document.getElementById('searchInput').value.trim();
-      if (keyword) loadProducts(keyword);
+      if (keyword) {
+        loadProducts(keyword);
+        document.getElementById('products-section').scrollIntoView({ behavior: 'smooth' });
+      }
+    }
+
+    function resetSearch() {
+      document.getElementById('searchInput').value = '';
+      loadProducts();
     }
 
     init();
+
+    window.addEventListener('scroll', () => {
+    // Triggers as soon as you move 20px
+    if (window.scrollY > 20) {
+      document.body.classList.add('nav-scrolled');
+    } else {
+      document.body.classList.remove('nav-scrolled');
+    }
+  });
   </script>
 </body>
 </html>
