@@ -293,12 +293,12 @@ init();
 
 Built by the **Tronixy Team**:
 
-| Name | Role | Contact |
-|---|---|---|
-| **Devo-Hacker** | Full Stack Lead | [GitHub](https://github.com/Devo-Hacker) |
-| **Niladree Bihari Nayak** | Backend & Auth | [niladreebiharinayak@gmail.com](mailto:niladreebiharinayak@gmail.com) |
-| **Sakshi Mishra** | Frontend & UI | [mishra0108sakshi@gmail.com](mailto:mishra0108sakshi@gmail.com) |
-| **Sanjana** | Testing & Design | [sanjanacps185@gmail.com](mailto:sanjanacps185@gmail.com) |
+| Name | Contact |
+|---|---|
+| **Devo-Hacker** | [GitHub](https://github.com/Devo-Hacker) |
+| **Niladree Bihari Nayak** | [niladreebiharinayak@gmail.com](mailto:niladreebiharinayak@gmail.com) |
+| **Sakshi Mishra** | [mishra0108sakshi@gmail.com](mailto:mishra0108sakshi@gmail.com) |
+| **Sanjana** | [sanjanacps185@gmail.com](mailto:sanjanacps185@gmail.com) |
 
 ---
 
