@@ -242,6 +242,10 @@ Add this to `.vscode/settings.json` in the root:
 Right-click `client/index.html` → **Open with Live Server**
 
 The app will open at `http://127.0.0.1:5500/pages/home.html`
+<br>
+<img width="1897" height="908" alt="image" src="https://github.com/user-attachments/assets/a3d8dd55-6bc1-4000-b1a9-03e3ba6e3362" />
+<br>
+<img width="1915" height="895" alt="image" src="https://github.com/user-attachments/assets/f9a61ed2-57a3-4272-8212-560cbee6a4a0" />
 
 ---
 
@@ -250,46 +254,18 @@ The app will open at `http://127.0.0.1:5500/pages/home.html`
 | Page | File | Access |
 |---|---|---|
 | Home | `pages/home.html` | Public |
-<br>
-<img width="1897" height="908" alt="image" src="https://github.com/user-attachments/assets/a3d8dd55-6bc1-4000-b1a9-03e3ba6e3362" />
 | Login | `pages/login.html` | Public |
-<br>
-<img width="663" height="539" alt="image" src="https://github.com/user-attachments/assets/fde82fce-0590-43ac-87f8-ed40d345880d" />
 | Register | `pages/register.html` | Public |
-<br>
-<img width="1893" height="905" alt="Screenshot 2026-04-26 103915" src="https://github.com/user-attachments/assets/7a86e0f4-06f4-462d-b222-845031543173" />
 | Product Detail | `pages/product.html?id=` | Public |
-<br>
-<img width="1899" height="909" alt="image" src="https://github.com/user-attachments/assets/cb6cf246-5948-4da7-abc8-c7ede2dddf88" />
-<br>
-<img width="1895" height="903" alt="image" src="https://github.com/user-attachments/assets/70a60d3a-853b-4a73-bc45-2ab6e6728415" />
 | Cart | `pages/cart.html` | Public |
-<br>
-<img width="1913" height="905" alt="image" src="https://github.com/user-attachments/assets/35244711-75ed-4375-9028-b7aeb92fbd45" />
 | Checkout | `pages/checkout.html` | 🔒 User |
-<br>
-<img width="1913" height="901" alt="image" src="https://github.com/user-attachments/assets/7c4c2d21-355d-4948-aa29-c334b698ab79" />
 | My Orders | `pages/my-orders.html` | 🔒 User |
-<br>
-<img width="1910" height="891" alt="image" src="https://github.com/user-attachments/assets/eb92e0d8-d229-4c05-b20a-010512c3de19" />
 | Order Detail | `pages/order-detail.html?id=` | 🔒 User |
-<br>
-<img width="1893" height="896" alt="image" src="https://github.com/user-attachments/assets/92293a41-7b99-4179-b50c-7e25a45e1e37" />
 | Profile | `pages/profile.html` | 🔒 User and 🔒 Admin  |
-<br>
-<img width="1914" height="894" alt="image" src="https://github.com/user-attachments/assets/e40745e6-cc07-41ac-91eb-50c213dd16eb" />
 | Admin Dashboard | `pages/admin/dashboard.html` | 🔒 Admin |
-<br>
-<img width="1915" height="895" alt="image" src="https://github.com/user-attachments/assets/f9a61ed2-57a3-4272-8212-560cbee6a4a0" />
 | Admin Products | `pages/admin/products.html` | 🔒 Admin |
-<br>
-<img width="1899" height="911" alt="image" src="https://github.com/user-attachments/assets/0efaf99e-ebc2-4942-96ae-45921bdd5dea" />
 | Admin Orders | `pages/admin/orders.html` | 🔒 Admin |
-<br>
-<img width="1901" height="907" alt="image" src="https://github.com/user-attachments/assets/1517fd4f-ffa1-4701-ad1a-182057f9989a" />
 | Admin Categories | `pages/admin/categories.html` | 🔒 Admin |
-<br>
-<img width="1913" height="893" alt="image" src="https://github.com/user-attachments/assets/c6eaace2-e88f-4152-a09a-dc10dfce3158" />
 
 ---
 
