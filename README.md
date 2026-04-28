@@ -28,7 +28,7 @@ The platform features a **Rule-Based Recommendation System** that suggests relev
 
 ### 🛍️ User Features
 - **Product Search & Filtering** — Search by keyword, filter by category
-- **Rule-Based Recommendation System** — Smart product suggestions based on category and price proximity (±₹5000 range)
+- **Rule-Based Recommendation System** — Smart product suggestions based on category and price proximity (±₹9000 range)
 - **Product Reviews & Ratings** — Logged-in users can submit reviews and star ratings
 - **Shopping Cart** — Add, remove, update quantities — persisted in localStorage
 - **Checkout** — Shipping info, COD or Online payment selection, automatic GST calculation
