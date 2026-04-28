@@ -154,7 +154,7 @@ Passwords are **never stored in plain text** — a Mongoose pre-save hook runs `
 | GET | `/` | Public | Get all products (with category populated) |
 | GET | `/search?keyword=` | Public | Search products by name (MongoDB regex) |
 | GET | `/:id` | Public | Single product detail |
-| GET | `/recommend/:id` | Public | Similar products by category + price range (±₹5000) |
+| GET | `/recommend/:id` | Public | Similar products by category + price range (±₹9000) |
 | POST | `/create` | 🔒 Admin | Create product with Cloudinary image upload |
 | PUT | `/:id` | 🔒 Admin | Update product details |
 | PUT | `/image/:id` | 🔒 Admin | Add extra image to existing product |
